@@ -7,6 +7,15 @@ du mot en surbrillance et de la barre de progression.
 from typing import Dict, Any
 
 THEMES: Dict[str, Dict[str, Any]] = {
+    "gospel": {
+        "name": "Lumière Divine & Gospel (Or Céleste)",
+        "hook_color": "&H0000D7FF&",       # Jaune or céleste
+        "hook_outline": "&H00000000&",     # Contour net
+        "sub_primary": "&H00FFFFFF&",      # Blanc pur
+        "sub_highlight": "&H0000D7FF&",    # Or éclatant sur les mots forts (Dieu, Foi, Victoire)
+        "progress_color": "0xFFD700",       # Barre dorée
+        "font_name": "DejaVu Sans"
+    },
     "gold": {
         "name": "Karl Studio Gold (Dark Luxury)",
         "hook_color": "&H0000D7FF&",       # Jaune or éclatant (format ASS BGR)
@@ -37,4 +46,4 @@ THEMES: Dict[str, Dict[str, Any]] = {
 }
 
 def get_theme(theme_name: str) -> Dict[str, Any]:
-    return THEMES.get(theme_name.lower(), THEMES["gold"])
+    return THEMES.get(theme_name.lower(), THEMES["gospel"])

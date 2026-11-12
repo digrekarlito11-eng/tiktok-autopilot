@@ -8,29 +8,32 @@ from .clip_extractor import ClipExtractor
 from .growth_optimizer import GrowthOptimizer
 from .video_formatter import VideoFormatter
 from .notifier import TikTokNotifier
+from .tiktok_publisher import TikTokPublisher
 
 class TikTokPipeline:
     """
     L'Orchestrateur Principal de la Machine TikTok.
     Pilote l'action conjointe de DevOps-Bot, Media-Bot et Growth-Bot.
-    Gère le téléchargement, le découpage, le branding (thème, watermark, barre de progression)
-    et les fiches de publication.
+    Gère le téléchargement, le découpage, le branding, les fiches de publication
+    et la publication directe sur TikTok.
     """
 
     def __init__(
         self,
         output_dir: str = "output",
         temp_dir: str = "downloads",
-        theme_name: str = "gold",
-        watermark: str = "@karlstudio",
+        theme_name: str = "gospel",
+        watermark: str = "@parole.de.foi",
         with_progress_bar: bool = True,
-        webhook_url: Optional[str] = None
+        webhook_url: Optional[str] = None,
+        publish_mode: str = "draft"  # "none", "draft", "public"
     ):
         self.output_dir = output_dir
         self.temp_dir = temp_dir
         self.theme_name = theme_name
         self.watermark = watermark
         self.with_progress_bar = with_progress_bar
+        self.publish_mode = publish_mode
 
         os.makedirs(self.output_dir, exist_ok=True)
         os.makedirs(self.temp_dir, exist_ok=True)
@@ -41,6 +44,7 @@ class TikTokPipeline:
         self.growth = GrowthOptimizer()
         self.formatter = VideoFormatter(output_dir=self.output_dir)
         self.notifier = TikTokNotifier(webhook_url=webhook_url)
+        self.publisher = TikTokPublisher()
 
     def process_url(self, url: str, top_k: int = 1) -> Dict[str, Any]:
         """
@@ -131,6 +135,16 @@ class TikTokPipeline:
             sheet_path = os.path.join(self.output_dir, sheet_filename)
             self.growth.export_summary_sheet(growth_package, sheet_path)
 
+            # Étape 7 : Publication directe ou mise en brouillon TikTok (DevOps-Bot & Publisher)
+            pub_result = None
+            if self.publish_mode != "none":
+                privacy = "PUBLIC_TO_EVERYONE" if self.publish_mode == "public" else "SELF_ONLY"
+                pub_result = self.publisher.publish_clip(
+                    video_path=final_video_path,
+                    growth_package=growth_package,
+                    privacy_level=privacy
+                )
+
             clip_info = {
                 "clip_number": idx,
                 "video_path": final_video_path,
@@ -143,12 +157,13 @@ class TikTokPipeline:
                 "duration": clip["duration"],
                 "retention": growth_package["estimated_retention"],
                 "theme": self.theme_name,
-                "watermark": self.watermark
+                "watermark": self.watermark,
+                "publication": pub_result
             }
 
             generated_clips.append(clip_info)
 
-            # Étape 7 : Notification automatique (DevOps-Bot)
+            # Étape 8 : Notification automatique (DevOps-Bot)
             self.notifier.notify_clip_ready(clip_info, total_clips=len(best_clips))
 
         # Rapport global

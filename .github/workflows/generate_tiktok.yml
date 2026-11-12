@@ -1,10 +1,10 @@
-name: 🚀 Usine de Production Vidéo TikTok
+name: 🚀 Usine de Production Vidéo TikTok (Prédications & Foi)
 
 on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: "🔗 Lien de la vidéo source (YouTube, interview, podcast...)"
+        description: "🔗 Lien de la prédication source (YouTube, culte, enseignement...)"
         required: true
         type: string
       clips_count:
@@ -17,19 +17,29 @@ on:
           - "2"
           - "3"
       theme:
-        description: "🎨 Thème Visuel & Palette Graphique"
+        description: "🎨 Thème Visuel & Ambiance"
         required: false
-        default: "gold"
+        default: "gospel"
         type: choice
         options:
+          - "gospel"
           - "gold"
           - "neon"
           - "minimal"
       watermark:
         description: "🏷️ Identifiant de Marque (Watermark Safe-Zone)"
         required: false
-        default: "@karlstudio"
+        default: "@parole.de.foi"
         type: string
+      publish_mode:
+        description: "📱 Publication TikTok"
+        required: false
+        default: "draft"
+        type: choice
+        options:
+          - "draft"
+          - "public"
+          - "none"
       progress_bar:
         description: "⏱️ Ajouter la barre de progression animée"
         required: false
@@ -38,7 +48,7 @@ on:
 
 jobs:
   build-tiktok:
-    name: 🎬 Génération Automatique TikTok
+    name: 🎬 Découpage & Publication TikTok
     runs-on: ubuntu-latest
 
     steps:
@@ -61,17 +71,19 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 🚀 Lancement de la Machine TikTok (Media-Bot & Growth-Bot)
+      - name: 🚀 Lancement de la Machine TikTok (Prédications & Foi)
+        env:
+          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
         run: |
-          ARGS="--url '${{ github.event.inputs.video_url }}' --clips ${{ github.event.inputs.clips_count }} --theme ${{ github.event.inputs.theme }} --watermark '${{ github.event.inputs.watermark }}' --output output"
+          ARGS="--url '${{ github.event.inputs.video_url }}' --clips ${{ github.event.inputs.clips_count }} --theme ${{ github.event.inputs.theme }} --watermark '${{ github.event.inputs.watermark }}' --publish ${{ github.event.inputs.publish_mode }} --output output"
           if [ "${{ github.event.inputs.progress_bar }}" != "true" ]; then
             ARGS="$ARGS --no-progress-bar"
           fi
           python main.py $ARGS
 
-      - name: 📦 Archivage des Vidéos TikTok & Fiches Prêtes à l'Emploi
+      - name: 📦 Archivage des Vidéos & Fiches Prêtes à l'Emploi
         uses: actions/upload-artifact@v4
         with:
-          name: tiktok-pack-${{ github.event.inputs.theme }}
+          name: tiktok-predication-${{ github.event.inputs.theme }}
           path: output/
           retention-days: 14

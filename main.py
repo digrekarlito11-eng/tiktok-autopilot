@@ -73,13 +73,14 @@ Abonne-toi maintenant et découvre Karl Studio dès aujourd'hui.
 
 def main():
     parser = argparse.ArgumentParser(description="TikTok Autopilot — Usine automatisée de clips TikTok pour Karl")
-    parser.add_argument("--url", type=str, help="Lien de la vidéo source (YouTube, interview, podcast...)")
+    parser.add_argument("--url", type=str, help="Lien de la vidéo source (YouTube, prédication, émission...)")
     parser.add_argument("--video", type=str, help="Chemin d'une vidéo locale MP4")
     parser.add_argument("--batch", type=str, help="Fichier texte contenant plusieurs liens (1 par ligne)")
     parser.add_argument("--clips", type=int, default=1, help="Nombre de clips TikTok à extraire par vidéo (défaut: 1)")
     parser.add_argument("--output", type=str, default="output", help="Dossier de sortie des vidéos TikTok")
-    parser.add_argument("--theme", type=str, default="gold", choices=["gold", "neon", "minimal"], help="Thème visuel (gold, neon, minimal)")
-    parser.add_argument("--watermark", type=str, default="@karlstudio", help="Badge / Watermark dans la Safe Zone (ex: @karlstudio)")
+    parser.add_argument("--theme", type=str, default="gospel", choices=["gospel", "gold", "neon", "minimal"], help="Thème visuel (gospel, gold, neon, minimal)")
+    parser.add_argument("--watermark", type=str, default="@parole.de.foi", help="Badge / Watermark dans la Safe Zone")
+    parser.add_argument("--publish", type=str, default="draft", choices=["none", "draft", "public"], help="Mode de publication TikTok (none, draft=Brouillon privé, public=Publication directe)")
     parser.add_argument("--no-progress-bar", action="store_true", help="Désactiver la barre de progression en bas")
     parser.add_argument("--webhook", type=str, help="URL de notification Webhook Discord ou Telegram")
     parser.add_argument("--demo", action="store_true", help="Lancer un test complet avec une vidéo de démo")
@@ -91,7 +92,7 @@ def main():
         return
 
     if not args.url and not args.video and not args.batch:
-        print("💡 Astuce Karl : Lance la démo avec '--demo' ou fournis un lien avec '--url <lien>'")
+        print("💡 Astuce Karl : Lance la démo avec '--demo' ou fournis un lien de prédication avec '--url <lien>'")
         parser.print_help()
         sys.exit(1)
 
@@ -100,7 +101,8 @@ def main():
         theme_name=args.theme,
         watermark=args.watermark,
         with_progress_bar=not args.no_progress_bar,
-        webhook_url=args.webhook
+        webhook_url=args.webhook,
+        publish_mode=args.publish
     )
 
     if args.batch:

@@ -1,27 +1,40 @@
 from typing import List, Dict, Any
 
-# Mots-clés déclencheurs d'émotion et de curiosité sur TikTok
+# Mots-clés déclencheurs d'émotion, de curiosité et d'impact spirituel sur TikTok
 VIRAL_KEYWORDS = {
+    # Mots-clés Foi & Prédication Chrétienne (Haute intensité émotionnelle)
+    "dieu": 3.5,
+    "jésus": 3.5,
+    "seigneur": 3.0,
+    "foi": 3.5,
+    "prière": 3.5,
+    "prophétie": 4.0,
+    "bénédiction": 3.5,
+    "miracle": 4.0,
+    "combat": 3.0,
+    "victoire": 3.5,
+    "grâce": 3.0,
+    "onction": 3.5,
+    "destinée": 3.5,
+    "témoignage": 3.5,
+    "délivrance": 4.0,
+    "promesse": 3.0,
+    "épreuve": 3.0,
+    "élévation": 3.5,
+    "parole": 2.5,
+    "gloire": 2.5,
+    # Mots-clés de curiosité et d'accroche universels
     "secret": 3.0,
     "erreur": 3.0,
     "pourquoi": 2.5,
     "comment": 2.5,
-    "argent": 2.5,
     "vérité": 2.5,
-    "problème": 2.0,
-    "règle": 2.0,
-    "méthode": 2.0,
+    "attention": 2.5,
     "jamais": 2.0,
     "toujours": 1.5,
-    "résultat": 2.0,
-    "attention": 2.5,
-    "clé": 2.0,
-    "business": 2.0,
-    "succès": 2.0,
-    "arnaque": 2.5,
-    "personne": 2.0,
     "voici": 2.0,
-    "voilà": 1.5
+    "écoutez": 3.0,
+    "regarde": 2.5
 }
 
 class ClipExtractor:

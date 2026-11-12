@@ -20,23 +20,24 @@ class GrowthOptimizer:
         text = clip_info.get("text", "")
         first_sentence = clip_info.get("first_sentence", "")
 
-        # 1. Détermination du Hook pour le bandeau supérieur de la vidéo
+        # 1. Détermination du Hook pour le bandeau supérieur de la vidéo (Prédication & Foi)
         hook_banner = self._generate_hook_banner(first_sentence, text)
 
         # 2. Génération de la description TikTok (Caption)
         caption = self._generate_caption(text, video_title)
 
-        # 3. Sélection des hashtags performants
+        # 3. Sélection des hashtags performants (Chrétien, Foi, Côte d'Ivoire, Viral)
         hashtags = self._select_hashtags(text)
 
         # 4. Score de rétention prévisionnel
-        estimated_retention = min(89, int(65 + clip_info.get("score", 10) * 1.5))
+        estimated_retention = min(92, int(70 + clip_info.get("score", 10) * 1.4))
 
-        # 5. Créneaux de publication recommandés (Algorithme TikTok France)
+        # 5. Créneaux de publication recommandés pour la Côte d'Ivoire (Fuseau horaire GMT / Abidjan)
         posting_slots = [
-            "Midi : 12h00 - 13h30 (Pic de pause déjeuner)",
-            "Soirée : 18h30 - 20h45 (Pic de forte audience active)",
-            "Dimanche soir : 19h00 - 21h30 (Record hebdomadaire d'engagement)"
+            "🌅 Matin (05h30 - 06h45 GMT) : Prière & Parole matinale (Fort taux de partage dès le réveil)",
+            "☀️ Midi (12h30 - 13h45 GMT) : Pause déjeuner & Exhortation quotidienne",
+            "🌙 Soir (19h30 - 21h30 GMT) : Déclaration de foi & Prière du soir avant de dormir",
+            "⛪ Dimanche (14h00 - 16h00 & 19h00 - 22h00 GMT) : Pic hebdomadaire chrétien maximal"
         ]
 
         package = {
@@ -45,65 +46,63 @@ class GrowthOptimizer:
             "hashtags": hashtags,
             "full_post_text": f"{caption}\n\n{' '.join(hashtags)}",
             "estimated_retention": f"{estimated_retention}%",
-            "recommended_audio": "Son tendance ou voix originale avec boost de volume",
-            "cta": "Lien en bio pour découvrir Karl Studio & rejoindre la liste VIP 🎵",
+            "recommended_audio": "Voix originale claire ou fond instrumental Gospel doux",
+            "cta": "Écris 'AMEN' en commentaire si tu reçois cette parole 🙏",
             "recommended_schedule": posting_slots,
-            "karl_studio_link": "https://digrekarlito11-eng.github.io/karl-studio/"
+            "location_focus": "Côte d'Ivoire (GMT / Abidjan) & Diaspora Francophone"
         }
 
         return package
 
     def _generate_hook_banner(self, first_sentence: str, full_text: str) -> str:
-        """Produit une phrase choc courte en majuscules pour le bandeau du haut."""
+        """Produit une phrase choc courte pour le bandeau supérieur spécial prédication chrétienne."""
         text_lower = (first_sentence + " " + full_text).lower()
 
-        if "secret" in text_lower or "vérité" in text_lower:
-            return "LE SECRET QUE PERSONNE NE DIT 🤫"
-        elif "erreur" in text_lower or "problème" in text_lower:
-            return "L'ERREUR FATALE À ÉVITER 🚨"
-        elif "argent" in text_lower or "riche" in text_lower or "business" in text_lower:
-            return "COMMENT GAGNER EN BUSINESS 💸"
-        elif "pourquoi" in text_lower:
-            return "POURQUOI TOUT LE MONDE SE TROMPE ⚡"
-        elif "comment" in text_lower:
-            return "LA MÉTHODE EXACTE EN 30 SECONDES ⏱️"
-        elif "attention" in text_lower or "jamais" in text_lower:
-            return "NE FAIS PLUS JAMAIS ÇA 🛑"
-        elif "musique" in text_lower or "beat" in text_lower:
-            return "LES COULISSES DU STUDIO DE PRODUCTION 🎵"
+        if any(w in text_lower for w in ["prophétie", "prophétique", "annoncer"]):
+            return "ÉCOUTE CE MESSAGE PROPHÉTIQUE 🕊️"
+        elif any(w in text_lower for w in ["miracle", "impossible", "témoignage"]):
+            return "LE MIRACLE QUE TU ATTENDS ARRIVE ⚡"
+        elif any(w in text_lower for w in ["combat", "ennemi", "délivrance", "victoire"]):
+            return "TA VICTOIRE EST PROCHE DÉCLARE-LE ⚔️"
+        elif any(w in text_lower for w in ["prière", "prier", "demande"]):
+            return "FAIS CETTE PRIÈRE PUISSANTE 🙏"
+        elif any(w in text_lower for w in ["épreuve", "douleur", "pleurer", "difficile"]):
+            return "POURQUOI CETTE ÉPREUVE DANS TA VIE ? 📖"
+        elif any(w in text_lower for w in ["bénédiction", "bénir", "grâce", "élévation"]):
+            return "CETTE PAROLE VA CHANGER TA VIE ✨"
+        elif any(w in text_lower for w in ["foi", "croire", "douter"]):
+            return "NE DOUTE PLUS DE TA DESTINÉE 👑"
         else:
-            return "ÉCOUTE ÇA ATTENTIVEMENT 🎯"
+            return "DIEU A UN MESSAGE POUR TOI AUJOURD'HUI ✝️"
 
     def _generate_caption(self, text: str, video_title: str) -> str:
-        """Génère un texte court et engageant pour la légende TikTok."""
+        """Génère un texte engageant spécial communauté chrétienne."""
         words = text.split()
         summary = " ".join(words[:18]) + "..." if len(words) > 18 else text
 
         lines = [
-            f"👀 {summary}",
-            "Tu valides ou pas ? Dis-moi ton avis en commentaire 👇",
-            "🔗 Lien en bio pour accéder au hub Karl Studio 🚀",
-            "Enregistre la vidéo pour l'appliquer plus tard 📌"
+            f"📖 {summary}",
+            "Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoin d'être fortifié aujourd'hui. 🕊️",
+            "Écris 'AMEN' en commentaire pour sceller cette bénédiction 👇",
+            "Enregistre cette vidéo pour la réécouter dans tes moments de prière 📌"
         ]
         return "\n".join(lines)
 
     def _select_hashtags(self, text: str) -> List[str]:
-        """Sélectionne 5 à 7 hashtags ciblés."""
-        base_tags = ["#pourtoi", "#fyp", "#foryou"]
-        niche_tags = []
+        """Sélectionne des hashtags viraux chrétiens et géolocalisés Côte d'Ivoire."""
+        base_tags = ["#chretien", "#tiktokchretien", "#pourtoi", "#fyp"]
+        local_tags = ["#cotedivoire", "#abidjan", "#chretienconnecte"]
+        theme_tags = ["#priere", "#foi", "#jesus", "#predication", "#evangile"]
 
         text_lower = text.lower()
-        if any(w in text_lower for w in ["argent", "business", "succès", "investir"]):
-            niche_tags.extend(["#businessfrance", "#mindset", "#entrepreneuriat"])
-        if any(w in text_lower for w in ["conseil", "erreur", "méthode", "règle"]):
-            niche_tags.extend(["#conseil", "#apprendre", "#astuce"])
-        if any(w in text_lower for w in ["musique", "son", "beat", "artiste"]):
-            niche_tags.extend(["#musique", "#beatmaker", "#creation"])
+        if "prophétie" in text_lower:
+            theme_tags.insert(0, "#prophetie")
+        if "miracle" in text_lower:
+            theme_tags.insert(0, "#miracle")
+        if "combat" in text_lower:
+            theme_tags.insert(0, "#combatspirituel")
 
-        if not niche_tags:
-            niche_tags = ["#conseil", "#motivation", "#culture"]
-
-        all_tags = base_tags + niche_tags[:4]
+        all_tags = base_tags + local_tags[:2] + theme_tags[:4]
         return all_tags
 
     def export_summary_sheet(self, package: Dict[str, Any], output_path: str):
