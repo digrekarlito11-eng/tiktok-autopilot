@@ -1,0 +1,30 @@
+# Environnements virtuels
+.venv/
+venv/
+ENV/
+
+# Caches Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Téléchargements et vidéos temporaires / rendus
+downloads/
+output/
+temp/
+*.mp4
+*.mp3
+*.wav
+*.vtt
+*.ass
+
+# Modèles IA locaux
+models/
+.cache/
+
+# Fichiers OS et éditeurs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

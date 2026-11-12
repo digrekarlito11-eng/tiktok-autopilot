@@ -1,0 +1,54 @@
+name: 🚀 Usine de Production Vidéo TikTok
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: "🔗 Lien de la vidéo source (YouTube, interview, podcast...)"
+        required: true
+        type: string
+      clips_count:
+        description: "🔢 Nombre de clips TikTok à extraire"
+        required: false
+        default: "1"
+        type: choice
+        options:
+          - "1"
+          - "2"
+          - "3"
+
+jobs:
+  build-tiktok:
+    name: 🎬 Génération Automatique TikTok
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Récupération du dépôt
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Configuration de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: 🎞️ Installation de FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libass-dev
+
+      - name: 📦 Installation des dépendances
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🚀 Lancement de la Machine TikTok (Media-Bot & Growth-Bot)
+        run: |
+          python main.py --url "${{ github.event.inputs.video_url }}" --clips ${{ github.event.inputs.clips_count }} --output output
+
+      - name: 📦 Archivage des Vidéos TikTok & Fiches Prêtes à l'Emploi
+        uses: actions/upload-artifact@v4
+        with:
+          name: tiktok-ready-package
+          path: output/
+          retention-days: 14
