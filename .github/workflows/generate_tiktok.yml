@@ -16,6 +16,25 @@ on:
           - "1"
           - "2"
           - "3"
+      theme:
+        description: "🎨 Thème Visuel & Palette Graphique"
+        required: false
+        default: "gold"
+        type: choice
+        options:
+          - "gold"
+          - "neon"
+          - "minimal"
+      watermark:
+        description: "🏷️ Identifiant de Marque (Watermark Safe-Zone)"
+        required: false
+        default: "@karlstudio"
+        type: string
+      progress_bar:
+        description: "⏱️ Ajouter la barre de progression animée"
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   build-tiktok:
@@ -35,7 +54,7 @@ jobs:
       - name: 🎞️ Installation de FFmpeg
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg libass-dev
+          sudo apt-get install -y ffmpeg libass-dev fonts-dejavu-core
 
       - name: 📦 Installation des dépendances
         run: |
@@ -44,11 +63,15 @@ jobs:
 
       - name: 🚀 Lancement de la Machine TikTok (Media-Bot & Growth-Bot)
         run: |
-          python main.py --url "${{ github.event.inputs.video_url }}" --clips ${{ github.event.inputs.clips_count }} --output output
+          ARGS="--url '${{ github.event.inputs.video_url }}' --clips ${{ github.event.inputs.clips_count }} --theme ${{ github.event.inputs.theme }} --watermark '${{ github.event.inputs.watermark }}' --output output"
+          if [ "${{ github.event.inputs.progress_bar }}" != "true" ]; then
+            ARGS="$ARGS --no-progress-bar"
+          fi
+          python main.py $ARGS
 
       - name: 📦 Archivage des Vidéos TikTok & Fiches Prêtes à l'Emploi
         uses: actions/upload-artifact@v4
         with:
-          name: tiktok-ready-package
+          name: tiktok-pack-${{ github.event.inputs.theme }}
           path: output/
           retention-days: 14

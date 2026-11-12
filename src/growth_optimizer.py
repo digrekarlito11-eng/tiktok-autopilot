@@ -5,10 +5,12 @@ from typing import Dict, Any, List
 class GrowthOptimizer:
     """
     Sous-agent Growth-Bot / Spécialiste TikTok Viralité & Monétisation.
-    Prend l'extrait sélectionné et produit les éléments indispensables pour l'algorithme TikTok :
-    1. Hook visuel pour la bannière du haut (accroche immédiate des 3 secondes).
-    2. Description optimisée (SEO TikTok + Appel à l'action).
-    3. Hashtags ciblés et tendances.
+    Génère l'ensemble du package stratégique pour chaque extrait :
+    - Hook percutant pour stopper le swipe
+    - Description optimisée SEO TikTok avec CTA (Appel à l'action)
+    - Sélection des hashtags viraux
+    - Meilleur créneau horaire recommandé pour poster
+    - Redirection vers l'écosystème Karl Studio (Waitlist / Musique)
     """
 
     def __init__(self):
@@ -28,7 +30,14 @@ class GrowthOptimizer:
         hashtags = self._select_hashtags(text)
 
         # 4. Score de rétention prévisionnel
-        estimated_retention = min(88, int(60 + clip_info.get("score", 10) * 1.5))
+        estimated_retention = min(89, int(65 + clip_info.get("score", 10) * 1.5))
+
+        # 5. Créneaux de publication recommandés (Algorithme TikTok France)
+        posting_slots = [
+            "Midi : 12h00 - 13h30 (Pic de pause déjeuner)",
+            "Soirée : 18h30 - 20h45 (Pic de forte audience active)",
+            "Dimanche soir : 19h00 - 21h30 (Record hebdomadaire d'engagement)"
+        ]
 
         package = {
             "hook_banner": hook_banner,
@@ -37,7 +46,9 @@ class GrowthOptimizer:
             "full_post_text": f"{caption}\n\n{' '.join(hashtags)}",
             "estimated_retention": f"{estimated_retention}%",
             "recommended_audio": "Son tendance ou voix originale avec boost de volume",
-            "cta": "Partage à un ami qui a besoin d'entendre ça 💡"
+            "cta": "Lien en bio pour découvrir Karl Studio & rejoindre la liste VIP 🎵",
+            "recommended_schedule": posting_slots,
+            "karl_studio_link": "https://digrekarlito11-eng.github.io/karl-studio/"
         }
 
         return package
@@ -58,24 +69,26 @@ class GrowthOptimizer:
             return "LA MÉTHODE EXACTE EN 30 SECONDES ⏱️"
         elif "attention" in text_lower or "jamais" in text_lower:
             return "NE FAIS PLUS JAMAIS ÇA 🛑"
+        elif "musique" in text_lower or "beat" in text_lower:
+            return "LES COULISSES DU STUDIO DE PRODUCTION 🎵"
         else:
             return "ÉCOUTE ÇA ATTENTIVEMENT 🎯"
 
     def _generate_caption(self, text: str, video_title: str) -> str:
         """Génère un texte court et engageant pour la légende TikTok."""
-        # Prendre un extrait percutant
         words = text.split()
         summary = " ".join(words[:18]) + "..." if len(words) > 18 else text
 
         lines = [
             f"👀 {summary}",
-            "Tu es d'accord avec ça ? Dis-moi en commentaire 👇",
-            "Enregistre la vidéo pour ne pas l'oublier 📌"
+            "Tu valides ou pas ? Dis-moi ton avis en commentaire 👇",
+            "🔗 Lien en bio pour accéder au hub Karl Studio 🚀",
+            "Enregistre la vidéo pour l'appliquer plus tard 📌"
         ]
         return "\n".join(lines)
 
     def _select_hashtags(self, text: str) -> List[str]:
-        """Sélectionne 5 à 7 hashtags pertinents."""
+        """Sélectionne 5 à 7 hashtags ciblés."""
         base_tags = ["#pourtoi", "#fyp", "#foryou"]
         niche_tags = []
 
@@ -94,12 +107,13 @@ class GrowthOptimizer:
         return all_tags
 
     def export_summary_sheet(self, package: Dict[str, Any], output_path: str):
-        """Crée une fiche mémo prête à copier-coller pour Karl."""
+        """Crée une fiche mémo complète pour Karl."""
+        slots_str = "\n".join(f"  • {s}" for s in package['recommended_schedule'])
         content = f"""============================================================
-📱 FICHE PUBLICATION TIKTOK — SOCIÉTÉ AUTONOME (KARL)
+📱 FICHE STRATÉGIQUE PUBLICATION TIKTOK — KARL STUDIO
 ============================================================
 
-🎯 ACCROCHE VIDÉO (HOOK) :
+🎯 ACCROCHE VIDÉO (HOOK BANDEAU SUPÉRIEUR) :
 {package['hook_banner']}
 
 📝 DESCRIPTION DU POST (À COPIER-COLLER DANS TIKTOK) :
@@ -107,10 +121,14 @@ class GrowthOptimizer:
 {package['full_post_text']}
 ------------------------------------------------------------
 
-📈 CONSEILS STRATÉGIQUES GROWTH-BOT :
+⏰ CRÉNEAUX HORAIRES RECOMMANDÉS POUR PUBLIER :
+{slots_str}
+
+📈 CONSEILS D'OPTIMISATION GROWTH-BOT :
 - Rétention estimée : {package['estimated_retention']}
 - Appel à l'action : {package['cta']}
-- Astuce TikTok : Réponds aux 3 premiers commentaires dans les 30 minutes suivant la publication pour booster la viralité !
+- Conversion : Oriente le trafic vers {package['karl_studio_link']}
+- Règle d'or : Réponds aux 3 premiers commentaires dans les 30 premières minutes pour déclencher l'algorithme "Pour Toi" !
 
 ============================================================
 """
