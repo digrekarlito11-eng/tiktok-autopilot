@@ -87,6 +87,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
+          playwright install --with-deps chromium
 
       - name: 🚀 Lancement de la Machine TikTok (Prédications & Foi)
         env:
@@ -109,8 +110,9 @@ jobs:
           fi
           "${cmd[@]}"
 
-      - name: 📦 Archivage des Vidéos & Fiches Prêtes à l'Emploi
+      - name: 📦 Archivage des Vidéos, Fiches & Captures TikTok Studio
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: tiktok-predication-${{ github.event.inputs.theme }}
           path: output/

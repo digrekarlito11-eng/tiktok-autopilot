@@ -139,16 +139,34 @@ class TikTokPublisher:
 
         # Si une session TikTok Studio (Méthode 1) est configurée
         if self.session_id:
-            print("✨ [DevOps-Bot] Connexion à TikTok Studio Web validée via TIKTOK_SESSION_ID.")
-            print(f"📦 [DevOps-Bot] Vidéo et payload prêts pour injection Studio : {video_filename}")
-            return {
-                "status": "success",
-                "method": "tiktok_studio_session",
-                "session_active": True,
-                "privacy_level": privacy_level,
-                "payload_file": payload_file,
-                "message": "Session TikTok Studio active. Vidéo prête pour publication !"
-            }
+            print("✨ [DevOps-Bot] Connexion à TikTok Studio Web active via TIKTOK_SESSION_ID.")
+            try:
+                try:
+                    from .tiktok_studio_uploader import TikTokStudioUploader
+                except ImportError:
+                    from tiktok_studio_uploader import TikTokStudioUploader
+
+                upload_mode = "public" if privacy_level == "PUBLIC_TO_EVERYONE" else "draft"
+                uploader = TikTokStudioUploader(
+                    session_id=self.session_id,
+                    screenshots_dir=os.path.join(os.path.dirname(video_path) or "output", "screenshots")
+                )
+                upload_res = uploader.upload(
+                    video_path=video_path,
+                    caption=post_caption,
+                    mode=upload_mode
+                )
+                upload_res["payload_file"] = payload_file
+                upload_res["method"] = "tiktok_studio_playwright"
+                return upload_res
+            except Exception as e_uploader:
+                print(f"⚠️ [DevOps-Bot] Exception lors de l'envoi Playwright : {e_uploader}")
+                return {
+                    "status": "error",
+                    "method": "tiktok_studio_playwright",
+                    "error": str(e_uploader),
+                    "payload_file": payload_file
+                }
 
         # Mode simulation / Assistant connecté (sans clé API ni session)
         print(f"ℹ️ [DevOps-Bot] Clé TikTok en attente de configuration. Fiche et payload enregistrés : {payload_file}")
