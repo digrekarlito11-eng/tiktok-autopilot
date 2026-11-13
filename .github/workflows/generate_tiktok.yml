@@ -55,6 +55,23 @@ jobs:
       - name: 📥 Récupération du dépôt
         uses: actions/checkout@v4
 
+      - name: 🌐 Configuration Réseau Anti-Blocage (Cloudflare WARP)
+        uses: fscarmen/warp-on-actions@v1.4
+        continue-on-error: true
+        with:
+          stack: dual
+          mode: wireguard
+
+      - name: 🍪 Configuration Cookies YouTube (Contournement Bot Datacenter)
+        env:
+          YOUTUBE_COOKIES_TEXT: ${{ secrets.YOUTUBE_COOKIES_TEXT }}
+        run: |
+          if [ -n "$YOUTUBE_COOKIES_TEXT" ]; then
+            echo "$YOUTUBE_COOKIES_TEXT" > /tmp/youtube_cookies.txt
+            echo "YOUTUBE_COOKIES_FILE=/tmp/youtube_cookies.txt" >> $GITHUB_ENV
+            echo "🍪 Cookies YouTube injectés pour contourner les restrictions d'IP cloud."
+          fi
+
       - name: ⚙️ Configuration de Python
         uses: actions/setup-python@v5
         with:
