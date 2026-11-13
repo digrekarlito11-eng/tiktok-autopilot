@@ -67,6 +67,7 @@ class VideoDownloader:
             "--sub-format", "vtt/best",
             "--no-playlist",
             "--no-abort-on-error",
+            "--merge-output-format", "mp4",
             "--output", output_template,
             url
         ]
@@ -104,11 +105,12 @@ class VideoDownloader:
         video_file = None
         subtitle_file = None
 
+        valid_video_exts = (".mp4", ".mkv", ".webm", ".mov")
         for fname in sorted(os.listdir(session_dir)):
             full_p = os.path.join(session_dir, fname)
-            if fname.startswith(video_id) and fname.endswith(".mp4"):
+            if fname.startswith(video_id) and any(fname.endswith(ext) for ext in valid_video_exts):
                 video_file = full_p
-            elif fname.endswith(".mp4") and video_file is None:
+            elif any(fname.endswith(ext) for ext in valid_video_exts) and video_file is None:
                 video_file = full_p
 
             if fname.startswith(video_id) and (fname.endswith(".vtt") or fname.endswith(".srt")):
@@ -117,10 +119,10 @@ class VideoDownloader:
             elif (fname.endswith(".vtt") or fname.endswith(".srt")) and not subtitle_file:
                 subtitle_file = full_p
 
-        # Échec strict si aucun fichier MP4 n'a été produit (aucun fallback aléatoire)
+        # Échec strict si aucun fichier vidéo n'a été produit (aucun fallback aléatoire)
         if not video_file or not os.path.exists(video_file):
             raise RuntimeError(
-                f"Échec du téléchargement pour {url} : aucun fichier vidéo .mp4 généré pour l'identifiant '{video_id}' dans '{session_dir}'."
+                f"Échec du téléchargement pour {url} : aucun fichier vidéo ({', '.join(valid_video_exts)}) généré pour l'identifiant '{video_id}' dans '{session_dir}'."
             )
 
         print(f"✅ [Media-Bot] Vidéo prête : {video_file}")
