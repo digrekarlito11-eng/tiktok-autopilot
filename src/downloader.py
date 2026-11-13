@@ -25,11 +25,18 @@ class VideoDownloader:
         url = str(url).strip().strip("'\"").strip()
         info_cmd = [
             sys.executable, "-m", "yt_dlp",
+            "--js-runtimes", "node",
+            "--remote-components", "ejs:github",
             "--extractor-args", "youtube:player_client=android,web",
             "--dump-json",
             "--no-playlist",
             url
         ]
+
+        # Support optionnel des cookies YouTube via secret d'environnement
+        cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE")
+        if cookies_file and os.path.exists(cookies_file):
+            info_cmd.extend(["--cookies", cookies_file])
 
         try:
             result = subprocess.run(info_cmd, capture_output=True, text=True, check=True)
@@ -50,6 +57,8 @@ class VideoDownloader:
         url = str(url).strip().strip("'\"").strip()
         dl_cmd = [
             sys.executable, "-m", "yt_dlp",
+            "--js-runtimes", "node",
+            "--remote-components", "ejs:github",
             "--extractor-args", "youtube:player_client=android,web",
             "--format", "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best",
             "--write-auto-subs",
@@ -60,6 +69,11 @@ class VideoDownloader:
             "--output", output_template,
             url
         ]
+
+        cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE")
+        if cookies_file and os.path.exists(cookies_file):
+            dl_cmd.extend(["--cookies", cookies_file])
+
         subprocess.run(dl_cmd, check=True)
 
     def download(self, url: str) -> Dict[str, Any]:
