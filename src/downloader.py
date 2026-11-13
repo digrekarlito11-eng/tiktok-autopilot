@@ -25,6 +25,7 @@ class VideoDownloader:
         url = str(url).strip().strip("'\"").strip()
         info_cmd = [
             sys.executable, "-m", "yt_dlp",
+            "--extractor-args", "youtube:player_client=android,web",
             "--dump-json",
             "--no-playlist",
             url
@@ -49,7 +50,8 @@ class VideoDownloader:
         url = str(url).strip().strip("'\"").strip()
         dl_cmd = [
             sys.executable, "-m", "yt_dlp",
-            "--format", "bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+            "--extractor-args", "youtube:player_client=android,web",
+            "--format", "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best",
             "--write-auto-subs",
             "--write-subs",
             "--sub-langs", "fr.*,en.*",
