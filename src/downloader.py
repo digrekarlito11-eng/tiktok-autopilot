@@ -27,7 +27,7 @@ class VideoDownloader:
             sys.executable, "-m", "yt_dlp",
             "--js-runtimes", "node",
             "--remote-components", "ejs:github",
-            "--extractor-args", "youtube:player_client=android,web",
+            "--extractor-args", "youtube:player_client=tv,web_embedded;player_skip=webpage",
             "--dump-json",
             "--no-playlist",
             url
@@ -59,7 +59,7 @@ class VideoDownloader:
             sys.executable, "-m", "yt_dlp",
             "--js-runtimes", "node",
             "--remote-components", "ejs:github",
-            "--extractor-args", "youtube:player_client=android,web",
+            "--extractor-args", "youtube:player_client=tv,web_embedded;player_skip=webpage",
             "--format", "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best",
             "--write-auto-subs",
             "--write-subs",
