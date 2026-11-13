@@ -63,9 +63,10 @@ class VideoDownloader:
             "--format", "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best",
             "--write-auto-subs",
             "--write-subs",
-            "--sub-langs", "fr.*,en.*",
+            "--sub-langs", "fr.*",
             "--sub-format", "vtt/best",
             "--no-playlist",
+            "--no-abort-on-error",
             "--output", output_template,
             url
         ]
