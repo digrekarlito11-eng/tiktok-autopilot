@@ -49,7 +49,8 @@ class GrowthOptimizer:
             "recommended_audio": "Voix originale claire ou fond instrumental Gospel doux",
             "cta": "Écris 'AMEN' en commentaire si tu reçois cette parole 🙏",
             "recommended_schedule": posting_slots,
-            "location_focus": "Côte d'Ivoire (GMT / Abidjan) & Diaspora Francophone"
+            "location_focus": "Côte d'Ivoire (GMT / Abidjan) & Diaspora Francophone",
+            "karl_studio_link": "https://digrekarlito11-eng.github.io/karl-studio/"
         }
 
         return package
@@ -107,26 +108,27 @@ class GrowthOptimizer:
 
     def export_summary_sheet(self, package: Dict[str, Any], output_path: str):
         """Crée une fiche mémo complète pour Karl."""
-        slots_str = "\n".join(f"  • {s}" for s in package['recommended_schedule'])
+        slots_str = "\n".join(f"  • {s}" for s in package.get('recommended_schedule', []))
         content = f"""============================================================
 📱 FICHE STRATÉGIQUE PUBLICATION TIKTOK — KARL STUDIO
 ============================================================
 
 🎯 ACCROCHE VIDÉO (HOOK BANDEAU SUPÉRIEUR) :
-{package['hook_banner']}
+{package.get('hook_banner', '')}
 
 📝 DESCRIPTION DU POST (À COPIER-COLLER DANS TIKTOK) :
 ------------------------------------------------------------
-{package['full_post_text']}
+{package.get('full_post_text', '')}
 ------------------------------------------------------------
 
 ⏰ CRÉNEAUX HORAIRES RECOMMANDÉS POUR PUBLIER :
 {slots_str}
 
 📈 CONSEILS D'OPTIMISATION GROWTH-BOT :
-- Rétention estimée : {package['estimated_retention']}
-- Appel à l'action : {package['cta']}
-- Conversion : Oriente le trafic vers {package['karl_studio_link']}
+- Rétention estimée : {package.get('estimated_retention', 'N/A')}
+- Appel à l'action : {package.get('cta', '')}
+- Ciblage géographique (location_focus) : {package.get('location_focus', "Côte d'Ivoire (GMT / Abidjan) & Diaspora")}
+- Conversion : Oriente le trafic vers {package.get('karl_studio_link', 'https://digrekarlito11-eng.github.io/karl-studio/')}
 - Règle d'or : Réponds aux 3 premiers commentaires dans les 30 premières minutes pour déclencher l'algorithme "Pour Toi" !
 
 ============================================================

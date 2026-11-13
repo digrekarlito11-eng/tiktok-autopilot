@@ -21,6 +21,34 @@ def clean_subtitle_text(text: str) -> str:
     clean = " ".join(clean.split())
     return clean
 
+def deduplicate_rolling_text(prev_text: str, curr_text: str) -> str:
+    """
+    Supprime la répétition due aux sous-titres à fenêtre roulante (rolling-window captions)
+    générés automatiquement par YouTube/TikTok.
+    Compare la fin de prev_text et le début de curr_text et élimine le chevauchement.
+    """
+    if not prev_text or not curr_text:
+        return curr_text
+
+    prev_words = prev_text.split()
+    curr_words = curr_text.split()
+
+    # Mots normalisés (insensibles à la casse et ponctuation) pour la détection
+    norm_prev = [re.sub(r'[^\w]', '', w.lower()) for w in prev_words]
+    norm_curr = [re.sub(r'[^\w]', '', w.lower()) for w in curr_words]
+
+    # Chercher le plus grand préfixe de curr_words qui correspond à un suffixe de prev_words
+    max_k = min(len(prev_words), len(curr_words))
+    for k in range(max_k, 0, -1):
+        if norm_prev[-k:] == norm_curr[:k]:
+            # Dédupliquer si le chevauchement est d'au moins 2 mots,
+            # ou si l'un des segments est constitué d'un seul mot complet répété
+            if k >= 2 or len(prev_words) == 1 or len(curr_words) == 1:
+                trimmed = curr_words[k:]
+                return " ".join(trimmed)
+
+    return curr_text
+
 class VideoTranscriber:
     """
     Sous-agent Media-Bot / Transcripteur intelligent.
@@ -54,21 +82,69 @@ class VideoTranscriber:
         current_start = None
         current_end = None
         current_text = []
+        last_cue_text: Optional[str] = None
 
         time_pattern = re.compile(r'(\d+:\d+:[\d\.]+|\d+:[\d\.]+)\s*-->\s*(\d+:\d+:[\d\.]+|\d+:[\d\.]+)')
+
+        def _add_segment(start: float, end: float, raw_text_lines: List[str]) -> None:
+            nonlocal last_cue_text
+            if not raw_text_lines or start is None or end is None:
+                return
+
+            # Nettoyer et dédupliquer les lignes répétées au sein du même cue
+            cleaned_lines = []
+            for l in raw_text_lines:
+                cl = clean_subtitle_text(l)
+                if not cl:
+                    continue
+                if cleaned_lines and cl.startswith(cleaned_lines[-1]):
+                    cleaned_lines[-1] = cl
+                elif cleaned_lines and cleaned_lines[-1].startswith(cl):
+                    continue
+                elif cl not in cleaned_lines:
+                    cleaned_lines.append(cl)
+
+            raw_txt = " ".join(cleaned_lines)
+            if not raw_txt:
+                return
+
+            full_txt = raw_txt
+
+            # Déduplication à fenêtre roulante avec préservation du contexte multi-lignes
+            if segments:
+                # Contexte de comparaison : tester d'abord contre le texte complet du cue précédent
+                # (préserve la fenêtre glissante YouTube à 3-5 lignes),
+                # sinon repli sur le texte du dernier segment enregistré.
+                prev_context = last_cue_text if last_cue_text else segments[-1]["text"]
+                deduped = deduplicate_rolling_text(prev_context, raw_txt)
+
+                # Si aucun chevauchement trouvé avec le cue précédent mais qu'il y en a avec le dernier segment
+                if deduped == raw_txt and prev_context != segments[-1]["text"]:
+                    deduped = deduplicate_rolling_text(segments[-1]["text"], raw_txt)
+
+                if not deduped:
+                    # Le cue actuel est un duplicata complet du précédent : prolonger sa durée
+                    segments[-1]["end"] = max(segments[-1]["end"], end)
+                    last_cue_text = raw_txt
+                    return
+
+                full_txt = deduped
+
+            last_cue_text = raw_txt
+
+            if full_txt:
+                segments.append({
+                    "start": start,
+                    "end": end,
+                    "text": full_txt
+                })
 
         for line in lines:
             line_str = line.strip()
             match = time_pattern.search(line_str)
             if match:
                 if current_start is not None and current_text:
-                    full_txt = clean_subtitle_text(" ".join(current_text))
-                    if full_txt:
-                        segments.append({
-                            "start": current_start,
-                            "end": current_end,
-                            "text": full_txt
-                        })
+                    _add_segment(current_start, current_end, current_text)
                 current_start = parse_vtt_timestamp(match.group(1))
                 current_end = parse_vtt_timestamp(match.group(2))
                 current_text = []
@@ -76,13 +152,7 @@ class VideoTranscriber:
                 current_text.append(line_str)
 
         if current_start is not None and current_text:
-            full_txt = clean_subtitle_text(" ".join(current_text))
-            if full_txt:
-                segments.append({
-                    "start": current_start,
-                    "end": current_end,
-                    "text": full_txt
-                })
+            _add_segment(current_start, current_end, current_text)
 
         return segments
 

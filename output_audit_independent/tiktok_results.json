@@ -1,0 +1,40 @@
+{
+  "source_title": "Masterclass Karl Studio",
+  "clips_count": 1,
+  "theme": "gospel",
+  "watermark": "@karlstudio",
+  "clips": [
+    {
+      "clip_number": 1,
+      "video_path": "output_audit_independent/tiktok_Masterclass Karl Stu_clip_1_0s.mp4",
+      "sheet_path": "output_audit_independent/FICHE_TIKTOK_Masterclass Karl Stu_clip_1.txt",
+      "hook": "DIEU A UN MESSAGE POUR TOI AUJOURD'HUI ✝️",
+      "caption": "📖 Voici le grand secret que 99% des créateurs ignorent. L'erreur fatale est de passer des heures sur du...\nReçois cette parole dans ta vie et partage-la à quelqu'un qui a besoin d'être fortifié aujourd'hui. 🕊️\nÉcris 'AMEN' en commentaire pour sceller cette bénédiction 👇\nEnregistre cette vidéo pour la réécouter dans tes moments de prière 📌",
+      "hashtags": [
+        "#chretien",
+        "#tiktokchretien",
+        "#pourtoi",
+        "#fyp",
+        "#cotedivoire",
+        "#abidjan",
+        "#priere",
+        "#foi",
+        "#jesus",
+        "#predication"
+      ],
+      "start": 0.5,
+      "end": 34.0,
+      "duration": 33.5,
+      "retention": "92%",
+      "theme": "gospel",
+      "watermark": "@karlstudio",
+      "publication": {
+        "status": "ready_to_publish",
+        "method": "ready_package",
+        "privacy_level": "SELF_ONLY",
+        "payload_file": "output_audit_independent/tiktok_Masterclass Karl Stu_clip_1_0s_tiktok_payload.json",
+        "instructions": "Ajoute TIKTOK_ACCESS_TOKEN dans les Secrets GitHub pour publier en 100% automatique sans toucher à ton téléphone."
+      }
+    }
+  ]
+}

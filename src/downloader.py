@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import uuid
 import subprocess
 from typing import Dict, Any, Optional
 
@@ -15,42 +16,39 @@ class VideoDownloader:
         self.download_dir = download_dir
         os.makedirs(self.download_dir, exist_ok=True)
 
-    def download(self, url: str) -> Dict[str, Any]:
+    def get_video_info(self, url: str) -> Dict[str, Any]:
         """
-        Télécharge la vidéo au format MP4 optimal (max 1080p pour le traitement 9:16).
-        Récupère également les sous-titres en français ou anglais si disponibles.
+        Extrait les métadonnées de la vidéo via yt-dlp sans la télécharger.
+        Invoque [sys.executable, "-m", "yt_dlp", ...] pour garantir l'utilisation
+        du paquet dans l'environnement virtuel actif.
         """
-        print(f"📥 [Media-Bot] Analyse du lien source : {url}")
-        
-        # Obtenir les métadonnées de la vidéo sans la télécharger d'abord
+        url = str(url).strip().strip("'\"").strip()
         info_cmd = [
-            "yt-dlp",
+            sys.executable, "-m", "yt_dlp",
             "--dump-json",
             "--no-playlist",
             url
         ]
-        
+
         try:
             result = subprocess.run(info_cmd, capture_output=True, text=True, check=True)
-            video_info = json.loads(result.stdout)
-            title = video_info.get("title", "video_source")
-            video_id = video_info.get("id", "source")
-            duration = video_info.get("duration", 0)
+            return json.loads(result.stdout)
         except Exception as e:
             print(f"⚠️ Impossible d'extraire les infos détaillées via yt-dlp: {e}")
-            title = "video_source"
-            video_id = "source"
-            duration = 0
+            return {
+                "title": "video_source",
+                "id": "source",
+                "duration": 0
+            }
 
-        # Nettoyage du titre pour les fichiers
-        safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '_', '-')).rstrip()[:40].strip()
-        output_template = os.path.join(self.download_dir, f"{video_id}_%(title).40s.%(ext)s")
-
-        print(f"🎬 [Media-Bot] Téléchargement de la vidéo : '{title}' (Durée: {duration}s)")
-
-        # Commande de téléchargement avec extraction automatique des sous-titres
+    def _download_video(self, url: str, output_template: str) -> None:
+        """
+        Télécharge le flux vidéo MP4 et les sous-titres via yt-dlp.
+        Utilise [sys.executable, "-m", "yt_dlp", ...] pour la résilience de l'interpréteur.
+        """
+        url = str(url).strip().strip("'\"").strip()
         dl_cmd = [
-            "yt-dlp",
+            sys.executable, "-m", "yt_dlp",
             "--format", "bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4]/best",
             "--write-auto-subs",
             "--write-subs",
@@ -60,29 +58,53 @@ class VideoDownloader:
             "--output", output_template,
             url
         ]
-
         subprocess.run(dl_cmd, check=True)
 
-        # Identifier les fichiers téléchargés
+    def download(self, url: str) -> Dict[str, Any]:
+        """
+        Télécharge la vidéo au format MP4 optimal (max 1080p pour le traitement 9:16).
+        Isole le téléchargement dans un sous-dossier de session unique pour éviter
+        toute collision ou fallback vers des fichiers arbitraires non liés.
+        """
+        url = str(url).strip().strip("'\"").strip()
+        print(f"📥 [Media-Bot] Analyse du lien source : {url}")
+        video_info = self.get_video_info(url)
+        title = video_info.get("title", "video_source")
+        video_id = str(video_info.get("id", "source"))
+        duration = video_info.get("duration", 0)
+
+        # Création d'un sous-répertoire de session isolé pour éviter tout conflit ou fallback parasite
+        session_id = f"session_{video_id}_{uuid.uuid4().hex[:8]}"
+        session_dir = os.path.join(self.download_dir, session_id)
+        os.makedirs(session_dir, exist_ok=True)
+
+        output_template = os.path.join(session_dir, f"{video_id}_%(title).40s.%(ext)s")
+
+        print(f"🎬 [Media-Bot] Téléchargement de la vidéo : '{title}' (Durée: {duration}s)")
+        self._download_video(url, output_template)
+
+        # Identifier les fichiers téléchargés strictement dans le répertoire de session
         video_file = None
         subtitle_file = None
 
-        for fname in os.listdir(self.download_dir):
-            if fname.startswith(video_id):
-                full_p = os.path.join(self.download_dir, fname)
-                if fname.endswith(".mp4"):
-                    video_file = full_p
-                elif fname.endswith(".vtt") or fname.endswith(".srt"):
-                    # Privilégier les sous-titres FR
-                    if "fr" in fname.lower() or not subtitle_file:
-                        subtitle_file = full_p
+        for fname in sorted(os.listdir(session_dir)):
+            full_p = os.path.join(session_dir, fname)
+            if fname.startswith(video_id) and fname.endswith(".mp4"):
+                video_file = full_p
+            elif fname.endswith(".mp4") and video_file is None:
+                video_file = full_p
 
-        if not video_file:
-            # Fallback chercher n'importe quel mp4 récent
-            for fname in os.listdir(self.download_dir):
-                if fname.endswith(".mp4"):
-                    video_file = os.path.join(self.download_dir, fname)
-                    break
+            if fname.startswith(video_id) and (fname.endswith(".vtt") or fname.endswith(".srt")):
+                if "fr" in fname.lower() or not subtitle_file:
+                    subtitle_file = full_p
+            elif (fname.endswith(".vtt") or fname.endswith(".srt")) and not subtitle_file:
+                subtitle_file = full_p
+
+        # Échec strict si aucun fichier MP4 n'a été produit (aucun fallback aléatoire)
+        if not video_file or not os.path.exists(video_file):
+            raise RuntimeError(
+                f"Échec du téléchargement pour {url} : aucun fichier vidéo .mp4 généré pour l'identifiant '{video_id}' dans '{session_dir}'."
+            )
 
         print(f"✅ [Media-Bot] Vidéo prête : {video_file}")
         if subtitle_file:

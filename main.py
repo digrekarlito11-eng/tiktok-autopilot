@@ -113,7 +113,8 @@ def main():
             urls = [line.strip() for line in f if line.strip() and not line.strip().startswith("#")]
         pipeline.process_batch(urls, top_k=args.clips)
     elif args.url:
-        pipeline.process_url(args.url, top_k=args.clips)
+        clean_url = args.url.strip().strip("'\"").strip()
+        pipeline.process_url(clean_url, top_k=args.clips)
     elif args.video:
         pipeline.process_local_file(args.video, top_k=args.clips)
 

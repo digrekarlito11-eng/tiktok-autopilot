@@ -74,12 +74,23 @@ jobs:
       - name: 🚀 Lancement de la Machine TikTok (Prédications & Foi)
         env:
           TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+          TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
+          TIKTOK_WEBHOOK_URL: ${{ secrets.TIKTOK_WEBHOOK_URL }}
+          VIDEO_URL: ${{ github.event.inputs.video_url }}
+          CLIPS_COUNT: ${{ github.event.inputs.clips_count }}
+          THEME: ${{ github.event.inputs.theme }}
+          WATERMARK: ${{ github.event.inputs.watermark }}
+          PUBLISH_MODE: ${{ github.event.inputs.publish_mode }}
+          PROGRESS_BAR: ${{ github.event.inputs.progress_bar }}
         run: |
-          ARGS="--url '${{ github.event.inputs.video_url }}' --clips ${{ github.event.inputs.clips_count }} --theme ${{ github.event.inputs.theme }} --watermark '${{ github.event.inputs.watermark }}' --publish ${{ github.event.inputs.publish_mode }} --output output"
-          if [ "${{ github.event.inputs.progress_bar }}" != "true" ]; then
-            ARGS="$ARGS --no-progress-bar"
+          cmd=(python main.py --url "$VIDEO_URL" --clips "$CLIPS_COUNT" --theme "$THEME" --watermark "$WATERMARK" --publish "$PUBLISH_MODE" --output output)
+          if [ "$PROGRESS_BAR" != "true" ]; then
+            cmd+=(--no-progress-bar)
           fi
-          python main.py $ARGS
+          if [ -n "$TIKTOK_WEBHOOK_URL" ]; then
+            cmd+=(--webhook "$TIKTOK_WEBHOOK_URL")
+          fi
+          "${cmd[@]}"
 
       - name: 📦 Archivage des Vidéos & Fiches Prêtes à l'Emploi
         uses: actions/upload-artifact@v4
