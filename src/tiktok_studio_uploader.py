@@ -742,7 +742,8 @@ class TikTokStudioUploader:
                     const found = findEditTargetInRow(rowEl);
                     if (!found || !found.target) continue;
                     found.target.setAttribute('data-autopilot-edit-idx', String(tagIdx));
-                    const sig = (rowEl.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 160);
+                    const rawSigText = (rowEl.innerText || '').replace(/\s+/g, ' ').trim();
+                    const sig = rawSigText.length <= 160 ? rawSigText : (rawSigText.slice(0, 95) + ' | ' + rawSigText.slice(-60));
                     results.push({
                         idx: tagIdx,
                         signature: sig,
@@ -1092,13 +1093,20 @@ class TikTokStudioUploader:
                 self._warmup_session(page)
                 page.goto(drafts_url, wait_until="domcontentloaded", timeout=60000)
 
+                zero_probe_streak = 0
                 for _ in range(12):
                     if "login" in page.url.lower():
                         break
                     rows_probe = self._discover_draft_rows(page)
-                    counts_probe = self._read_studio_tab_counts(page)
-                    if rows_probe or counts_probe["drafts"] == 0:
+                    if rows_probe:
                         break
+                    counts_probe = self._read_studio_tab_counts(page)
+                    if counts_probe["drafts"] == 0:
+                        zero_probe_streak += 1
+                        if zero_probe_streak >= 3:
+                            break
+                    else:
+                        zero_probe_streak = 0
                     time.sleep(1.5)
 
                 self._dismiss_popups(page)
@@ -1189,13 +1197,12 @@ class TikTokStudioUploader:
 
                     # Attente que la table se charge et que le brouillon tout juste publié disparaisse
                     rows: List[Dict[str, Any]] = []
-                    for reload_wait in range(10):
+                    counts_now: Dict[str, Optional[int]] = {"publications": None, "drafts": None}
+                    zero_drafts_streak = 0
+                    for reload_wait in range(14):
                         self._dismiss_popups(page)
                         rows = self._discover_draft_rows(page)
                         counts_now = self._read_studio_tab_counts(page)
-                        if counts_now["drafts"] == 0:
-                            rows = []
-                            break
                         if rows:
                             if last_published_sig and rows[0]["signature"] == last_published_sig and reload_wait < 4:
                                 time.sleep(1.5)
@@ -1203,6 +1210,18 @@ class TikTokStudioUploader:
                                     page.reload(wait_until="domcontentloaded", timeout=45000)
                                 continue
                             break
+                        if counts_now["drafts"] == 0:
+                            zero_drafts_streak += 1
+                            if zero_drafts_streak >= 3:
+                                rows = []
+                                break
+                        else:
+                            zero_drafts_streak = 0
+                        if reload_wait == 5:
+                            try:
+                                page.reload(wait_until="domcontentloaded", timeout=45000)
+                            except Exception:
+                                pass
                         time.sleep(1.5)
 
                     target_row = next((r for r in rows if r["signature"] not in failed_signatures), None)
@@ -1217,7 +1236,10 @@ class TikTokStudioUploader:
                             except Exception:
                                 pass
                         if target_row is None:
-                            print("🏁 [DevOps-Bot] Plus aucun brouillon éligible dans la liste.")
+                            print(
+                                f"🏁 [DevOps-Bot] Plus aucun brouillon éligible dans la liste "
+                                f"(onglet_brouillons={counts_now.get('drafts')}, lignes={len(rows)}, ignorés={len(failed_signatures)})."
+                            )
                             break
 
                     sig = target_row["signature"]

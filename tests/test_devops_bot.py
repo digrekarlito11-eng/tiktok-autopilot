@@ -897,3 +897,136 @@ def test_draft_publisher_cli_writes_report_and_handles_empty(tmp_path):
     assert saved["status"] == "success"
 
 
+def test_publish_all_drafts_handles_transient_zero_hydration_flicker(tmp_path):
+    """Vérifie qu'un affichage transitoire 'Brouillons 0' avant chargement XHR n'arrête pas la boucle."""
+    import types
+    from src.tiktok_studio_uploader import TikTokStudioUploader
+
+    screens_dir = tmp_path / "draft_flicker_screens"
+
+    class FlickerLocator:
+        def __init__(self, selector, page):
+            self.selector = selector
+            self.page = page
+
+        def count(self):
+            if self.selector.startswith("[data-autopilot-edit-idx='"):
+                idx = int(self.selector.split("'")[1])
+                return 1 if (not self.page.in_editor and idx < len(self.page.draft_rows)) else 0
+            if self.selector == "button[data-e2e='post_video_button']" and self.page.in_editor:
+                return 1
+            return 0
+
+        @property
+        def first(self):
+            return self
+
+        def nth(self, idx):
+            return self
+
+        def is_visible(self):
+            return self.count() > 0
+
+        def scroll_into_view_if_needed(self):
+            return None
+
+        def get_attribute(self, attr):
+            return None
+
+        def click(self, **kwargs):
+            if self.selector.startswith("[data-autopilot-edit-idx='"):
+                idx = int(self.selector.split("'")[1])
+                self.page.active_draft = self.page.draft_rows[idx]
+                self.page.in_editor = True
+                self.page.url = "https://www.tiktok.com/tiktokstudio/upload?from=draft"
+            elif self.selector == "button[data-e2e='post_video_button']":
+                sig = self.page.active_draft["signature"]
+                self.page.draft_rows = [r for r in self.page.draft_rows if r["signature"] != sig]
+                self.page.published_count += 1
+                self.page.in_editor = False
+                self.page.url = "https://www.tiktok.com/tiktokstudio/content?tab=draft"
+
+    class FlickerPage:
+        def __init__(self):
+            self.url = "about:blank"
+            self.in_editor = False
+            self.published_count = 0
+            self.active_draft = None
+            self.loading_polls_left = 0
+            self.draft_rows = [
+                {"idx": 0, "signature": "Brouillon A 22:50", "strategy": "right_cluster_first(3)"},
+                {"idx": 1, "signature": "Brouillon B 22:48", "strategy": "right_cluster_first(3)"},
+                {"idx": 2, "signature": "Brouillon C 22:45", "strategy": "right_cluster_first(3)"},
+            ]
+
+        def set_default_timeout(self, ms):
+            pass
+
+        def on(self, event, cb):
+            pass
+
+        def goto(self, url, **kwargs):
+            self.url = url
+            if "tab=draft" in url:
+                self.in_editor = False
+                # Simule 2 lectures transitoires "Brouillons 0" pendant le chargement React
+                if self.published_count > 0:
+                    self.loading_polls_left = 2
+
+        def reload(self, **kwargs):
+            self.loading_polls_left = 0
+
+        def locator(self, sel):
+            return FlickerLocator(sel, self)
+
+        def inner_text(self, sel):
+            if self.in_editor:
+                return "Paramètres Quand publier"
+            if self.loading_polls_left > 0:
+                return f"Publications {self.published_count}\nBrouillons 0"
+            return f"Publications {self.published_count}\nBrouillons {len(self.draft_rows)}"
+
+        def evaluate(self, script):
+            if "findEditTargetInRow" in script:
+                if self.loading_polls_left > 0:
+                    self.loading_polls_left -= 1
+                    return []
+                return [
+                    {"idx": i, "signature": r["signature"], "strategy": r["strategy"]}
+                    for i, r in enumerate(self.draft_rows)
+                ]
+            return None
+
+        def screenshot(self, path, **kwargs):
+            Path(path).write_bytes(b"PNG")
+
+    fake_page = FlickerPage()
+    fake_context = MagicMock()
+    fake_context.new_page.return_value = fake_page
+    fake_context.pages = [fake_page]
+    fake_browser = MagicMock()
+    fake_browser.version = "131.0.6778.85"
+    fake_browser.new_context.return_value = fake_context
+    fake_p = MagicMock()
+    fake_p.chromium.launch.return_value = fake_browser
+    fake_cm = MagicMock()
+    fake_cm.__enter__.return_value = fake_p
+    fake_cm.__exit__.return_value = False
+
+    fake_sync_mod = types.ModuleType("playwright.sync_api")
+    fake_sync_mod.sync_playwright = lambda: fake_cm
+    fake_pw_mod = types.ModuleType("playwright")
+    fake_pw_mod.sync_api = fake_sync_mod
+
+    cookies_json = json.dumps([{"name": "sessionid", "value": "sess"}, {"name": "sid_tt", "value": "sid"}])
+
+    with patch.dict(sys.modules, {"playwright": fake_pw_mod, "playwright.sync_api": fake_sync_mod}):
+        with patch("time.sleep", return_value=None):
+            uploader = TikTokStudioUploader(session_id=cookies_json, screenshots_dir=str(screens_dir))
+            res = uploader.publish_all_drafts(max_count=10, pause_seconds=0.0)
+
+    assert res["status"] == "success"
+    assert res["published_count"] == 3
+    assert res["drafts_after"] == 0
+    assert res["publications_after"] == 3
+

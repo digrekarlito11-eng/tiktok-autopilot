@@ -47,7 +47,7 @@ jobs:
           PAUSE_SECONDS: ${{ github.event.inputs.pause_seconds || '3' }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
         run: |
-          cmd=(python -m src.draft_publisher --max "$MAX_DRAFTS" --pause "$PAUSE_SECONDS")
+          cmd=(python -u -m src.draft_publisher --max "$MAX_DRAFTS" --pause "$PAUSE_SECONDS")
           if [ "$DRY_RUN" = "true" ]; then
             cmd+=(--dry-run)
           fi
