@@ -20,19 +20,23 @@ class GrowthOptimizer:
         text = clip_info.get("text", "")
         first_sentence = clip_info.get("first_sentence", "")
 
-        # 1. Détermination du Hook pour le bandeau supérieur de la vidéo (Prédication & Foi)
-        hook_banner = self._generate_hook_banner(first_sentence, text)
+        # 1. Détermination du Hook pour le bandeau supérieur de la vidéo (Gospel Intelligence)
+        hook_banner = clip_info.get("recommended_hook") or self._generate_hook_banner(first_sentence, text)
 
-        # 2. Génération de la description TikTok (Caption)
-        caption = self._generate_caption(text, video_title)
+        # 2. Appel à l'action pour maximiser les commentaires (Comment Magnet)
+        cta = clip_info.get("recommended_cta") or "Écris 'AMEN' en commentaire pour sceller cette bénédiction 👇"
 
-        # 3. Sélection des hashtags performants (Chrétien, Foi, Côte d'Ivoire, Viral)
-        hashtags = self._select_hashtags(text)
+        # 3. Génération de la description TikTok (Caption)
+        caption = self._generate_caption(text, video_title, cta)
 
-        # 4. Score de rétention prévisionnel
-        estimated_retention = min(92, int(70 + clip_info.get("score", 10) * 1.4))
+        # 4. Sélection des hashtags performants (Chrétien, Foi, Prédicateurs, Côte d'Ivoire, Viral)
+        hashtags = self._select_hashtags(text, video_title)
 
-        # 5. Créneaux de publication recommandés pour la Côte d'Ivoire (Fuseau horaire GMT / Abidjan)
+        # 5. Score de rétention prévisionnel (optimisé pour vidéos de 1 à 2 min)
+        base_score = clip_info.get("score", 10)
+        estimated_retention = min(95, int(72 + (base_score % 22)))
+
+        # 6. Créneaux de publication recommandés pour la Côte d'Ivoire (Fuseau horaire GMT / Abidjan)
         posting_slots = [
             "🌅 Matin (05h30 - 06h45 GMT) : Prière & Parole matinale (Fort taux de partage dès le réveil)",
             "☀️ Midi (12h30 - 13h45 GMT) : Pause déjeuner & Exhortation quotidienne",
@@ -47,7 +51,7 @@ class GrowthOptimizer:
             "full_post_text": f"{caption}\n\n{' '.join(hashtags)}",
             "estimated_retention": f"{estimated_retention}%",
             "recommended_audio": "Voix originale claire ou fond instrumental Gospel doux",
-            "cta": "Écris 'AMEN' en commentaire si tu reçois cette parole 🙏",
+            "cta": cta,
             "recommended_schedule": posting_slots,
             "location_focus": "Côte d'Ivoire (GMT / Abidjan) & Diaspora Francophone",
             "karl_studio_link": "https://digrekarlito11-eng.github.io/karl-studio/"
@@ -76,7 +80,7 @@ class GrowthOptimizer:
         else:
             return "DIEU A UN MESSAGE POUR TOI AUJOURD'HUI ✝️"
 
-    def _generate_caption(self, text: str, video_title: str) -> str:
+    def _generate_caption(self, text: str, video_title: str, cta: str = "Écris 'AMEN' en commentaire pour sceller cette bénédiction 👇") -> str:
         """Génère un texte engageant spécial communauté chrétienne."""
         words = text.split()
         summary = " ".join(words[:18]) + "..." if len(words) > 18 else text
@@ -84,27 +88,45 @@ class GrowthOptimizer:
         lines = [
             f"📖 {summary}",
             "Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoin d'être fortifié aujourd'hui. 🕊️",
-            "Écris 'AMEN' en commentaire pour sceller cette bénédiction 👇",
+            cta,
             "Enregistre cette vidéo pour la réécouter dans tes moments de prière 📌"
         ]
         return "\n".join(lines)
 
-    def _select_hashtags(self, text: str) -> List[str]:
+    def _select_hashtags(self, text: str, video_title: str = "") -> List[str]:
         """Sélectionne des hashtags viraux chrétiens et géolocalisés Côte d'Ivoire."""
         base_tags = ["#chretien", "#tiktokchretien", "#pourtoi", "#fyp"]
-        local_tags = ["#cotedivoire", "#abidjan", "#chretienconnecte"]
-        theme_tags = ["#priere", "#foi", "#jesus", "#predication", "#evangile"]
+        local_tags = ["#cotedivoire", "#abidjan"]
+        theme_tags = ["#priere", "#foi", "#jesus", "#predication"]
 
-        text_lower = text.lower()
-        if "prophétie" in text_lower:
-            theme_tags.insert(0, "#prophetie")
-        if "miracle" in text_lower:
-            theme_tags.insert(0, "#miracle")
-        if "combat" in text_lower:
-            theme_tags.insert(0, "#combatspirituel")
+        combined = (text + " " + video_title).lower()
 
-        all_tags = base_tags + local_tags[:2] + theme_tags[:4]
-        return all_tags
+        # Tags spécifiques aux prédicateurs et thématiques clés
+        if any(w in combined for w in ["mariage", "foyer", "femme", "mari", "conjoint", "célibat"]):
+            theme_tags.append("#mariagechretien")
+            theme_tags.append("#marcelotunasi")
+        if any(w in combined for w in ["destinée", "destinee", "pensée", "mentalité"]):
+            theme_tags.append("#yvancastanou")
+            theme_tags.append("#destinee")
+        if any(w in combined for w in ["blocage", "autel", "cycle", "malédiction", "sanogo"]):
+            theme_tags.append("#mohamedsanogo")
+            theme_tags.append("#delivrance")
+        if any(w in combined for w in ["blessure", "guérison", "guerison", "coeur", "ondo"]):
+            theme_tags.append("#julianaondo")
+            theme_tags.append("#guerison")
+        if any(w in combined for w in ["jeunesse", "esprit de nuit", "djatti"]):
+            theme_tags.append("#yannickdjatti")
+            theme_tags.append("#reveil")
+
+        all_tags = base_tags + local_tags + theme_tags[:5]
+        # Dé-doublonnage tout en gardant l'ordre
+        seen = set()
+        deduped = []
+        for tag in all_tags:
+            if tag not in seen:
+                seen.add(tag)
+                deduped.append(tag)
+        return deduped
 
     def export_summary_sheet(self, package: Dict[str, Any], output_path: str):
         """Crée une fiche mémo complète pour Karl."""

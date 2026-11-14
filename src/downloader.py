@@ -16,13 +16,41 @@ class VideoDownloader:
         self.download_dir = download_dir
         os.makedirs(self.download_dir, exist_ok=True)
 
+    def resolve_video_url(self, url: str) -> str:
+        """
+        Si l'URL fournie est une playlist ou une bibliothèque YouTube,
+        extrait automatiquement la vidéo active (ou la 1ère vidéo de la bibliothèque).
+        """
+        clean_url = str(url).strip().strip("'\"").strip()
+        if "playlist?list=" in clean_url or "&list=" in clean_url:
+            print(f"📋 [Media-Bot] Bibliothèque / Playlist détectée : {clean_url}")
+            try:
+                cmd = [
+                    sys.executable, "-m", "yt_dlp",
+                    "--flat-playlist",
+                    "--dump-json",
+                    clean_url
+                ]
+                res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                lines = [l for l in res.stdout.strip().split("\n") if l.strip()]
+                if lines:
+                    first_item = json.loads(lines[0])
+                    video_id = first_item.get("id")
+                    if video_id:
+                        resolved = f"https://www.youtube.com/watch?v={video_id}"
+                        print(f"🎬 [Media-Bot] Prédication sélectionnée : '{first_item.get('title')}' ({resolved})")
+                        return resolved
+            except Exception as e_pl:
+                print(f"⚠️ Note playlist : {e_pl}")
+        return clean_url
+
     def get_video_info(self, url: str) -> Dict[str, Any]:
         """
         Extrait les métadonnées de la vidéo via yt-dlp sans la télécharger.
         Invoque [sys.executable, "-m", "yt_dlp", ...] pour garantir l'utilisation
         du paquet dans l'environnement virtuel actif.
         """
-        url = str(url).strip().strip("'\"").strip()
+        url = self.resolve_video_url(url)
         info_cmd = [
             sys.executable, "-m", "yt_dlp",
             "--js-runtimes", "node",
@@ -84,7 +112,7 @@ class VideoDownloader:
         Isole le téléchargement dans un sous-dossier de session unique pour éviter
         toute collision ou fallback vers des fichiers arbitraires non liés.
         """
-        url = str(url).strip().strip("'\"").strip()
+        url = self.resolve_video_url(url)
         print(f"📥 [Media-Bot] Analyse du lien source : {url}")
         video_info = self.get_video_info(url)
         title = video_info.get("title", "video_source")

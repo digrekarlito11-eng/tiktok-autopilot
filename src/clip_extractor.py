@@ -1,9 +1,41 @@
 import re
 from typing import List, Dict, Any, Optional
 
+try:
+    from .gospel_intelligence import GospelIntelligence
+except ImportError:
+    from gospel_intelligence import GospelIntelligence
+
 # Mots-clés déclencheurs d'émotion, de curiosité et d'impact spirituel sur TikTok
 VIRAL_KEYWORDS: Dict[str, float] = {
-    # Mots-clés Foi & Prédication Chrétienne (Haute intensité émotionnelle)
+    # Mots-clés Spécialisés Prédications (Tunasi, Castanou, Sanogo, Ondo, Djatti)
+    "mariage": 4.5,
+    "foyer": 4.5,
+    "conjoint": 4.0,
+    "célibat": 4.0,
+    "celibat": 4.0,
+    "divorce": 4.0,
+    "infidélité": 4.5,
+    "infidelite": 4.5,
+    "impudicité": 4.5,
+    "impudicite": 4.5,
+    "malédiction": 5.0,
+    "malediction": 5.0,
+    "malédictions": 5.0,
+    "maledictions": 5.0,
+    "blocage": 4.5,
+    "blocages": 4.5,
+    "autel": 4.5,
+    "autels": 4.5,
+    "blessure": 4.5,
+    "blessures": 4.5,
+    "guérison": 4.5,
+    "guerison": 4.5,
+    "rejet": 4.0,
+    "abandon": 4.0,
+    "pardon": 4.0,
+    "pauvreté": 4.0,
+    "pauvrete": 4.0,
     "dieu": 3.5,
     "jésus": 3.5,
     "jesus": 3.5,
@@ -171,17 +203,19 @@ class ClipExtractor:
     """
     Sous-agent Media-Bot & Growth-Bot / Détecteur de moments viraux.
     Analyse les phrases, repère les pics d'attention et découpe des clips
-    d'une durée idéale pour TikTok (entre 30 et 60 secondes).
-    Intègre la lemmatisation / normalisation NLP pour le français (élisions, pluriels).
+    d'une durée idéale pour TikTok (entre 1 et 2 minutes : 60s à 120s),
+    calibrés pour la monétisation (>60s) et les vérités bibliques percutantes.
+    Intègre l'Intelligence Spirituelle (Gospel Intelligence) sans coût d'API.
     """
 
-    def __init__(self, min_duration: float = 25.0, max_duration: float = 58.0):
+    def __init__(self, min_duration: float = 60.0, max_duration: float = 120.0):
         self.min_duration = min_duration
         self.max_duration = max_duration
 
-    def find_best_clips(self, segments: List[Dict[str, Any]], top_k: int = 1) -> List[Dict[str, Any]]:
+    def find_best_clips(self, segments: List[Dict[str, Any]], top_k: int = 10) -> List[Dict[str, Any]]:
         """
-        Trouve les meilleurs extraits en combinant durée idéale et score viral.
+        Trouve les meilleurs extraits en combinant durée de 1 à 2 min, score viral
+        et potentiel à générer des commentaires (Comment Magnet Score).
         """
         if not segments:
             return []
@@ -218,58 +252,65 @@ class ClipExtractor:
                 duration = end_t - start_t
                 if duration >= self.min_duration:
                     if duration <= self.max_duration:
-                        # Score normalisé par la fluidité
-                        # Bonus de densité de mots
+                        # Analyse d'impact spirituel via Gospel Intelligence (Growth-Bot)
+                        cand_text = " ".join(current_text)
+                        gospel_meta = GospelIntelligence.analyze_segment_spirituality(cand_text)
+
+                        # Bonus de densité de mots et cadence
                         word_count = sum(len(t.split()) for t in current_text)
                         cadence = word_count / duration # mots par seconde
+                        cadence_bonus = 1.0 if 1.8 <= cadence <= 4.2 else 0.6
 
-                        # Une bonne cadence parlée se situe entre 2.2 et 3.5 mots/sec
-                        cadence_bonus = 1.0 if 2.0 <= cadence <= 4.0 else 0.5
-                        final_score = (viral_score + 1.0) * cadence_bonus * (word_count / 10.0)
+                        # Score global : Mots clés + Aimant à commentaires (Comment Magnet)
+                        total_score = (viral_score + gospel_meta["comment_magnet_score"] + 1.0) * cadence_bonus * (word_count / 15.0)
 
                         candidates.append({
                             "start": round(start_t, 2),
                             "end": round(end_t, 2),
                             "duration": round(duration, 2),
-                            "score": round(final_score, 2),
-                            "text": " ".join(current_text),
+                            "score": round(total_score, 2),
+                            "text": cand_text,
                             "first_sentence": current_text[0],
                             "segments": segments[i:j+1],
-                            "matched_keywords": sorted(list(matched_keywords_set))
+                            "matched_keywords": sorted(list(matched_keywords_set)),
+                            "gospel_meta": gospel_meta,
+                            "dominant_archetype": gospel_meta["dominant_archetype"],
+                            "recommended_hook": gospel_meta["recommended_hook"],
+                            "recommended_cta": gospel_meta["recommended_cta"]
                         })
                     else:
                         break
 
         if not candidates:
-            # Fallback simple si la vidéo est courte
+            # Fallback si aucun segment ne fait 60s
             total_duration = segments[-1]["end"] - segments[0]["start"]
             end_time = min(segments[0]["start"] + self.max_duration, segments[-1]["end"])
-            fallback_matched = set()
-            for s in segments:
-                for w in s["text"].split():
-                    kw_score, kw_matched = find_keyword_match(w)
-                    if kw_score > 0 and kw_matched:
-                        fallback_matched.add(kw_matched)
+            fb_text = " ".join(s["text"] for s in segments)
+            fb_gospel = GospelIntelligence.analyze_segment_spirituality(fb_text)
 
             return [{
                 "start": segments[0]["start"],
                 "end": end_time,
                 "duration": round(end_time - segments[0]["start"], 2),
                 "score": 10.0,
-                "text": " ".join(s["text"] for s in segments),
+                "text": fb_text,
                 "first_sentence": segments[0]["text"],
                 "segments": segments,
-                "matched_keywords": sorted(list(fallback_matched))
+                "matched_keywords": [],
+                "gospel_meta": fb_gospel,
+                "dominant_archetype": fb_gospel["dominant_archetype"],
+                "recommended_hook": fb_gospel["recommended_hook"],
+                "recommended_cta": fb_gospel["recommended_cta"]
             }]
 
-        # Trier par score décroissant et dédoublonner les plages trop proches
+        # Trier par score décroissant et dédoublonner pour sélectionner jusqu'à top_k extraits distincts
         candidates.sort(key=lambda x: x["score"], reverse=True)
         selected = []
         for cand in candidates:
-            # Vérifier qu'il ne chevauche pas un clip déjà sélectionné à plus de 50%
             overlap = False
             for s in selected:
-                if not (cand["end"] < s["start"] or cand["start"] > s["end"]):
+                # Éviter le chevauchement excessif (tolère jusqu'à 5s de marge aux extrémités)
+                if not (cand["end"] <= s["start"] + 5.0 or cand["start"] >= s["end"] - 5.0):
                     overlap = True
                     break
             if not overlap:

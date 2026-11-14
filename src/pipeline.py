@@ -40,13 +40,13 @@ class TikTokPipeline:
 
         self.downloader = VideoDownloader(download_dir=self.temp_dir)
         self.transcriber = VideoTranscriber(model_size="tiny")
-        self.extractor = ClipExtractor(min_duration=25.0, max_duration=58.0)
+        self.extractor = ClipExtractor(min_duration=60.0, max_duration=120.0)
         self.growth = GrowthOptimizer()
         self.formatter = VideoFormatter(output_dir=self.output_dir)
         self.notifier = TikTokNotifier(webhook_url=webhook_url)
         self.publisher = TikTokPublisher()
 
-    def process_url(self, url: str, top_k: int = 1) -> Dict[str, Any]:
+    def process_url(self, url: str, top_k: int = 10) -> Dict[str, Any]:
         """
         Traite un lien vidéo (Option A) de bout en bout.
         """
@@ -63,7 +63,7 @@ class TikTokPipeline:
 
         return self._process_video_file(video_path, video_title, subtitle_path, top_k=top_k)
 
-    def process_batch(self, urls: List[str], top_k: int = 1) -> List[Dict[str, Any]]:
+    def process_batch(self, urls: List[str], top_k: int = 10) -> List[Dict[str, Any]]:
         """
         Traite une série de vidéos en rafale pour préparer le stock de contenu TikTok de Karl.
         """
@@ -81,7 +81,7 @@ class TikTokPipeline:
                 print(f"❌ Erreur sur la vidéo {u_clean} : {e}")
         return results
 
-    def process_local_file(self, video_path: str, video_title: Optional[str] = None, top_k: int = 1) -> Dict[str, Any]:
+    def process_local_file(self, video_path: str, video_title: Optional[str] = None, top_k: int = 10) -> Dict[str, Any]:
         """
         Traite un fichier vidéo local déjà sur la machine.
         """
@@ -94,7 +94,7 @@ class TikTokPipeline:
         video_path: str,
         video_title: str,
         subtitle_path: Optional[str],
-        top_k: int = 1
+        top_k: int = 10
     ) -> Dict[str, Any]:
         # Étape 2 : Transcription et horodatages (Media-Bot)
         segments = self.transcriber.transcribe(video_path, subtitle_path=subtitle_path)
