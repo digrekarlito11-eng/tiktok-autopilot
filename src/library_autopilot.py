@@ -85,45 +85,56 @@ class LibraryAutopilot:
         Utilise yt-dlp avec contournement anti-datacenter.
         """
         print(f"📡 [Autopilot 24/7] Analyse de la bibliothèque YouTube : {self.playlist_url}")
-        cmd = [
-            sys.executable, "-m", "yt_dlp",
-            "--js-runtimes", "node",
-            "--remote-components", "ejs:github",
-            "--extractor-args", "youtube:player_client=tv,web_embedded;player_skip=webpage",
-            "--flat-playlist",
-            "--dump-json",
-            self.playlist_url
+        cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE")
+        flag_sets = [
+            ["--force-ipv4"],
+            [
+                "--js-runtimes", "node",
+                "--remote-components", "ejs:github",
+                "--extractor-args", "youtube:player_client=tv,web_embedded;player_skip=webpage",
+            ],
         ]
 
-        cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE")
-        if cookies_file and os.path.exists(cookies_file):
-            cmd.extend(["--cookies", cookies_file])
+        last_error: Optional[Exception] = None
+        for extra_flags in flag_sets:
+            cmd = [
+                sys.executable, "-m", "yt_dlp",
+                *extra_flags,
+                "--flat-playlist",
+                "--dump-json",
+                self.playlist_url
+            ]
+            if cookies_file and os.path.exists(cookies_file):
+                cmd.extend(["--cookies", cookies_file])
 
-        try:
-            res = subprocess.run(cmd, capture_output=True, text=True, check=True)
-            items = []
-            for line in res.stdout.strip().split("\n"):
-                if not line.strip():
-                    continue
-                try:
-                    data = json.loads(line)
-                    v_id = data.get("id")
-                    if v_id:
-                        items.append({
-                            "id": v_id,
-                            "title": data.get("title", f"Vidéo {v_id}"),
-                            "duration": data.get("duration", 0),
-                            "duration_string": data.get("duration_string", "Inconnue"),
-                            "url": f"https://www.youtube.com/watch?v={v_id}",
-                            "uploader": data.get("uploader", "Prédicateur")
-                        })
-                except json.JSONDecodeError:
-                    continue
-            print(f"✅ [Autopilot] {len(items)} prédication(s) répertoriée(s) dans la bibliothèque de Karl.")
-            return items
-        except Exception as e:
-            print(f"❌ [Autopilot] Erreur lors de la lecture de la bibliothèque YouTube : {e}")
-            return []
+            try:
+                res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                items = []
+                for line in res.stdout.strip().split("\n"):
+                    if not line.strip():
+                        continue
+                    try:
+                        data = json.loads(line)
+                        v_id = data.get("id")
+                        if v_id:
+                            items.append({
+                                "id": v_id,
+                                "title": data.get("title", f"Vidéo {v_id}"),
+                                "duration": data.get("duration", 0),
+                                "duration_string": data.get("duration_string", "Inconnue"),
+                                "url": f"https://www.youtube.com/watch?v={v_id}",
+                                "uploader": data.get("uploader", "Prédicateur")
+                            })
+                    except json.JSONDecodeError:
+                        continue
+                print(f"✅ [Autopilot] {len(items)} prédication(s) répertoriée(s) dans la bibliothèque de Karl.")
+                return items
+            except Exception as e:
+                last_error = e
+                print(f"⚠️ [Autopilot] Tentative lecture playlist échouée : {e}")
+
+        print(f"❌ [Autopilot] Erreur lors de la lecture de la bibliothèque YouTube : {last_error}")
+        return []
 
     def get_unprocessed_videos(self) -> List[Dict[str, Any]]:
         """Filtre les prédications pour ne conserver que celles pas encore traitées."""
@@ -210,6 +221,18 @@ class LibraryAutopilot:
                     "4. Clique sur 'Publier' au moment où tu le souhaites !",
                     ""
                 ])
+        elif status.startswith("ERREUR"):
+            lines.append("## ⚠️ Incident Temporaire sur ce Cycle")
+            if last_video:
+                lines.extend([
+                    f"- **Prédication concernée :** {last_video.get('title', 'Inconnue')}",
+                    f"- **Lien :** [{last_video.get('url', '')}]({last_video.get('url', '')})",
+                ])
+            lines.extend([
+                "- **File d'attente :** La prédication reste en file d'attente et sera automatiquement retentée au prochain cycle 24/7.",
+                "- **Suivi :** Si le blocage YouTube persiste sur plusieurs passages, ajoutez optionnellement le secret `YOUTUBE_COOKIES_TEXT` ou relancez un cycle.",
+                ""
+            ])
         else:
             lines.extend([
                 "## ℹ️ État de la Bibliothèque",
@@ -244,6 +267,7 @@ class LibraryAutopilot:
         all_items = self.fetch_playlist_items()
         if not all_items:
             print("⚠️ Impossible d'accéder aux éléments de la bibliothèque. Vérifiez la connexion ou le lien.")
+            self.generate_markdown_report(status="ERREUR : Bibliothèque YouTube temporairement inaccessible")
             return {"status": "error", "message": "Bibliothèque inaccessible"}
 
         target_video = None

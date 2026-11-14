@@ -3,7 +3,8 @@ import sys
 import json
 import uuid
 import subprocess
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Tuple
+
 
 class VideoDownloader:
     """
@@ -12,9 +13,61 @@ class VideoDownloader:
     Extrait les sous-titres natifs pour gagner un temps précieux (0.5s vs plusieurs minutes).
     """
 
+    YOUTUBE_STRATEGIES: List[Tuple[str, List[str]]] = [
+        (
+            "tv,web_embedded",
+            [
+                "--js-runtimes", "node",
+                "--remote-components", "ejs:github",
+                "--extractor-args", "youtube:player_client=tv,web_embedded;player_skip=webpage",
+            ],
+        ),
+        (
+            "ipv4+default_ejs",
+            [
+                "--force-ipv4",
+                "--js-runtimes", "node",
+                "--remote-components", "ejs:github",
+            ],
+        ),
+        (
+            "ipv4+android_sdkless,mweb",
+            [
+                "--force-ipv4",
+                "--js-runtimes", "node",
+                "--remote-components", "ejs:github",
+                "--extractor-args", "youtube:player_client=android_sdkless,mweb",
+            ],
+        ),
+        (
+            "ipv4+android_vr",
+            [
+                "--force-ipv4",
+                "--extractor-args", "youtube:player_client=android_vr",
+            ],
+        ),
+    ]
+
     def __init__(self, download_dir: str = "downloads"):
         self.download_dir = download_dir
         os.makedirs(self.download_dir, exist_ok=True)
+
+    @staticmethod
+    def _is_youtube_url(url: str) -> bool:
+        lower = url.lower()
+        return "youtube.com" in lower or "youtu.be" in lower
+
+    @staticmethod
+    def _cleanup_partial_downloads(output_template: str) -> None:
+        session_dir = os.path.dirname(output_template)
+        if not session_dir or not os.path.isdir(session_dir):
+            return
+        for fname in os.listdir(session_dir):
+            if fname.endswith((".part", ".ytdl")):
+                try:
+                    os.remove(os.path.join(session_dir, fname))
+                except OSError:
+                    pass
 
     def resolve_video_url(self, url: str) -> str:
         """
@@ -24,24 +77,34 @@ class VideoDownloader:
         clean_url = str(url).strip().strip("'\"").strip()
         if "playlist?list=" in clean_url or "&list=" in clean_url:
             print(f"📋 [Media-Bot] Bibliothèque / Playlist détectée : {clean_url}")
-            try:
-                cmd = [
-                    sys.executable, "-m", "yt_dlp",
-                    "--flat-playlist",
-                    "--dump-json",
-                    clean_url
-                ]
-                res = subprocess.run(cmd, capture_output=True, text=True, check=True)
-                lines = [l for l in res.stdout.strip().split("\n") if l.strip()]
-                if lines:
-                    first_item = json.loads(lines[0])
-                    video_id = first_item.get("id")
-                    if video_id:
-                        resolved = f"https://www.youtube.com/watch?v={video_id}"
-                        print(f"🎬 [Media-Bot] Prédication sélectionnée : '{first_item.get('title')}' ({resolved})")
-                        return resolved
-            except Exception as e_pl:
-                print(f"⚠️ Note playlist : {e_pl}")
+            cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE")
+            playlist_flags_list = [
+                [],
+                ["--force-ipv4"],
+                ["--force-ipv4", "--extractor-args", "youtube:player_client=android_vr"],
+            ]
+            for extra_flags in playlist_flags_list:
+                try:
+                    cmd = [
+                        sys.executable, "-m", "yt_dlp",
+                        *extra_flags,
+                        "--flat-playlist",
+                        "--dump-json",
+                        clean_url
+                    ]
+                    if cookies_file and os.path.exists(cookies_file):
+                        cmd.extend(["--cookies", cookies_file])
+                    res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                    lines = [l for l in res.stdout.strip().split("\n") if l.strip()]
+                    if lines:
+                        first_item = json.loads(lines[0])
+                        video_id = first_item.get("id")
+                        if video_id:
+                            resolved = f"https://www.youtube.com/watch?v={video_id}"
+                            print(f"🎬 [Media-Bot] Prédication sélectionnée : '{first_item.get('title')}' ({resolved})")
+                            return resolved
+                except Exception as e_pl:
+                    print(f"⚠️ Note playlist : {e_pl}")
         return clean_url
 
     def get_video_info(self, url: str) -> Dict[str, Any]:
@@ -51,68 +114,81 @@ class VideoDownloader:
         du paquet dans l'environnement virtuel actif.
         """
         url = self.resolve_video_url(url)
-        info_cmd = [
-            sys.executable, "-m", "yt_dlp",
-            "--js-runtimes", "node",
-            "--remote-components", "ejs:github",
-            "--extractor-args", "youtube:player_client=tv,web_embedded;player_skip=webpage",
-            "--dump-json",
-            "--no-playlist",
-            url
-        ]
-
-        # Support optionnel des cookies YouTube via secret d'environnement
         cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE")
-        if cookies_file and os.path.exists(cookies_file):
-            info_cmd.extend(["--cookies", cookies_file])
+        strategies = self.YOUTUBE_STRATEGIES if self._is_youtube_url(url) else [self.YOUTUBE_STRATEGIES[0]]
 
-        try:
-            result = subprocess.run(info_cmd, capture_output=True, text=True, check=True)
-            return json.loads(result.stdout)
-        except Exception as e:
-            print(f"⚠️ Impossible d'extraire les infos détaillées via yt-dlp: {e}")
-            return {
-                "title": "video_source",
-                "id": "source",
-                "duration": 0
-            }
+        last_error: Optional[Exception] = None
+        for strategy_name, extra_args in strategies:
+            info_cmd = [
+                sys.executable, "-m", "yt_dlp",
+                *extra_args,
+                "--dump-json",
+                "--no-playlist",
+                url
+            ]
+            if cookies_file and os.path.exists(cookies_file):
+                info_cmd.extend(["--cookies", cookies_file])
+
+            try:
+                result = subprocess.run(info_cmd, capture_output=True, text=True, check=True)
+                raw_out = result.stdout.strip()
+                first_json_line = raw_out.splitlines()[0] if raw_out else raw_out
+                return json.loads(first_json_line)
+            except Exception as e:
+                last_error = e
+                print(f"⚠️ [Media-Bot] Métadonnées ({strategy_name}) échouées : {e}")
+
+        print(f"⚠️ Impossible d'extraire les infos détaillées via yt-dlp: {last_error}")
+        return {
+            "title": "video_source",
+            "id": "source",
+            "duration": 0
+        }
 
     def _download_video(self, url: str, output_template: str) -> None:
         """
         Télécharge le flux vidéo MP4 et les sous-titres via yt-dlp.
-        Utilise [sys.executable, "-m", "yt_dlp", ...] pour la résilience de l'interpréteur.
+        Utilise [sys.executable, "-m", "yt_dlp", ...] pour la résilience de l'interpréteur,
+        avec bascule automatique entre clients YouTube en cas de blocage bot-check IP.
         """
         url = str(url).strip().strip("'\"").strip()
-        dl_cmd = [
-            sys.executable, "-m", "yt_dlp",
-            "--js-runtimes", "node",
-            "--remote-components", "ejs:github",
-            "--extractor-args", "youtube:player_client=tv,web_embedded;player_skip=webpage",
-            "--format", "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best",
-            "--write-auto-subs",
-            "--write-subs",
-            "--sub-langs", "fr.*",
-            "--sub-format", "vtt/best",
-            "--no-playlist",
-            "--no-abort-on-error",
-            "--merge-output-format", "mp4",
-            "--output", output_template,
-            url
-        ]
-
         cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE")
-        if cookies_file and os.path.exists(cookies_file):
-            dl_cmd.extend(["--cookies", cookies_file])
+        strategies = self.YOUTUBE_STRATEGIES if self._is_youtube_url(url) else [self.YOUTUBE_STRATEGIES[0]]
+        last_error: Optional[subprocess.CalledProcessError] = None
 
-        try:
-            subprocess.run(dl_cmd, check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"⚠️ Note sous-titres YouTube ({e}) : téléchargement direct du flux vidéo seul pour transcription locale...")
+        # Passe 1 : Vidéo + sous-titres natifs français (gain de temps majeur vs Whisper)
+        for strategy_name, extra_args in strategies:
+            dl_cmd = [
+                sys.executable, "-m", "yt_dlp",
+                *extra_args,
+                "--format", "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best",
+                "--write-auto-subs",
+                "--write-subs",
+                "--sub-langs", "fr.*",
+                "--sub-format", "vtt/best",
+                "--no-playlist",
+                "--no-abort-on-error",
+                "--merge-output-format", "mp4",
+                "--output", output_template,
+                url
+            ]
+            if cookies_file and os.path.exists(cookies_file):
+                dl_cmd.extend(["--cookies", cookies_file])
+
+            try:
+                subprocess.run(dl_cmd, check=True)
+                return
+            except subprocess.CalledProcessError as e:
+                last_error = e
+                self._cleanup_partial_downloads(output_template)
+                print(f"⚠️ [Media-Bot] Échec téléchargement + sous-titres ({strategy_name}) : {e}")
+
+        # Passe 2 : Vidéo seule (sans sous-titres) si le téléchargement des sous-titres échoue
+        print(f"⚠️ Note sous-titres YouTube ({last_error}) : téléchargement direct du flux vidéo seul pour transcription locale...")
+        for strategy_name, extra_args in strategies:
             fallback_cmd = [
                 sys.executable, "-m", "yt_dlp",
-                "--js-runtimes", "node",
-                "--remote-components", "ejs:github",
-                "--extractor-args", "youtube:player_client=tv,web_embedded;player_skip=webpage",
+                *extra_args,
                 "--format", "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best",
                 "--no-playlist",
                 "--merge-output-format", "mp4",
@@ -121,7 +197,17 @@ class VideoDownloader:
             ]
             if cookies_file and os.path.exists(cookies_file):
                 fallback_cmd.extend(["--cookies", cookies_file])
-            subprocess.run(fallback_cmd, check=True)
+
+            try:
+                subprocess.run(fallback_cmd, check=True)
+                return
+            except subprocess.CalledProcessError as e:
+                last_error = e
+                self._cleanup_partial_downloads(output_template)
+                print(f"⚠️ [Media-Bot] Échec flux direct ({strategy_name}) : {e}")
+
+        if last_error is not None:
+            raise last_error
 
     def download(self, url: str) -> Dict[str, Any]:
         """

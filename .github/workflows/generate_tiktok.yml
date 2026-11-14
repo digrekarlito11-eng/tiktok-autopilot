@@ -87,6 +87,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
+          pip install --upgrade yt-dlp
           playwright install --with-deps chromium
 
       - name: 🚀 Lancement de la Machine TikTok (Prédications & Foi)

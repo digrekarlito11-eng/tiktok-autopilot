@@ -179,3 +179,47 @@ def test_run_cycle_marks_processed_on_success(tmp_path):
     assert "SUCCES" in report
     assert "Liste des 2 Shorts" in report
 
+
+def test_generate_markdown_report_error_does_not_claim_all_processed(tmp_path):
+    history_file = str(tmp_path / "history.json")
+    report_file = str(tmp_path / "REPORT.md")
+
+    bot = LibraryAutopilot(history_path=history_file, report_path=report_file)
+    sample_video = {
+        "id": "g2cfTnE_Hpw",
+        "title": "Le mariage",
+        "url": "https://www.youtube.com/watch?v=g2cfTnE_Hpw",
+    }
+
+    bot.generate_markdown_report(status="ERREUR : Sign in required", last_video=sample_video, clips_info=[])
+
+    with open(report_file, "r", encoding="utf-8") as f:
+        report = f.read()
+    assert "Incident Temporaire sur ce Cycle" in report
+    assert "Le mariage" in report
+    assert "Toutes les prédications actuellement présentes" not in report
+
+
+def test_fetch_playlist_items_fallback_flags(tmp_path, monkeypatch):
+    import subprocess
+    history_file = str(tmp_path / "history.json")
+    report_file = str(tmp_path / "REPORT.md")
+    bot = LibraryAutopilot(history_path=history_file, report_path=report_file)
+
+    attempts = []
+
+    def mock_run(cmd, capture_output=True, text=True, check=True):
+        attempts.append(list(cmd))
+        if len(attempts) == 1:
+            raise subprocess.CalledProcessError(1, cmd)
+        res = MagicMock()
+        res.stdout = json.dumps({"id": "vid_ok", "title": "Prédication", "duration": 900}) + "\n"
+        return res
+
+    monkeypatch.setattr(subprocess, "run", mock_run)
+    items = bot.fetch_playlist_items()
+
+    assert len(attempts) == 2
+    assert "--force-ipv4" in attempts[0]
+    assert len(items) == 1
+    assert items[0]["id"] == "vid_ok"

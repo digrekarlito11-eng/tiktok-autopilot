@@ -99,6 +99,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
+          pip install --upgrade yt-dlp
           playwright install --with-deps chromium
 
       - name: 🚀 Exécution de l'Autopilot 24/7 (Bibliothèque YouTube -> TikTok Studio)

@@ -119,6 +119,54 @@ class TestVideoDownloader:
         assert "session_vid123_" in res["video_path"]
         assert res["subtitle_path"].endswith(".vtt")
 
+    def test_download_video_falls_back_across_youtube_clients_and_cleans_partials(self, tmp_path, monkeypatch):
+        """Falls back across YouTube strategies with subtitles preserved when primary client hits bot-check."""
+        downloader = VideoDownloader(download_dir=str(tmp_path))
+        session_dir = tmp_path / "session_yt_fallback"
+        session_dir.mkdir()
+        part_file = session_dir / "temp.mp4.part"
+        part_file.write_bytes(b"partial")
+
+        seen_cmds = []
+
+        def mock_run(cmd, check=True):
+            seen_cmds.append(list(cmd))
+            # Fail the first attempt (tv,web_embedded), succeed on second (ipv4+default_ejs)
+            if len(seen_cmds) == 1:
+                raise subprocess.CalledProcessError(1, cmd)
+            return MagicMock()
+
+        monkeypatch.setattr(subprocess, "run", mock_run)
+        output_tpl = str(session_dir / "vid_%(title).40s.%(ext)s")
+        downloader._download_video("https://www.youtube.com/watch?v=test_id", output_tpl)
+
+        assert len(seen_cmds) == 2
+        assert "tv,web_embedded" in " ".join(seen_cmds[0])
+        assert "--force-ipv4" in seen_cmds[1]
+        assert "--write-auto-subs" in seen_cmds[1]
+        assert not part_file.exists()
+
+    def test_get_video_info_falls_back_across_youtube_clients(self, monkeypatch):
+        """Falls back to secondary YouTube client strategies when tv,web_embedded metadata fetch fails."""
+        downloader = VideoDownloader()
+        calls = []
+
+        def mock_run(cmd, capture_output=True, text=True, check=True):
+            calls.append(list(cmd))
+            if len(calls) < len(VideoDownloader.YOUTUBE_STRATEGIES):
+                raise subprocess.CalledProcessError(1, cmd)
+            mock_res = MagicMock()
+            mock_res.stdout = json.dumps({"title": "Sermon Résilient", "id": "res_123", "duration": 600})
+            return mock_res
+
+        monkeypatch.setattr(subprocess, "run", mock_run)
+        info = downloader.get_video_info("https://www.youtube.com/watch?v=res_123")
+
+        assert len(calls) == len(VideoDownloader.YOUTUBE_STRATEGIES)
+        assert "android_vr" in " ".join(calls[-1])
+        assert info["id"] == "res_123"
+        assert info["title"] == "Sermon Résilient"
+
 
 # ============================================================================
 # TIER 1: FEATURE COVERAGE — VideoTranscriber & VTT Parsing
