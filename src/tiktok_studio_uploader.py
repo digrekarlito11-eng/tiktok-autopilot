@@ -1126,12 +1126,27 @@ class TikTokStudioUploader:
                 if dry_run:
                     for r in initial_rows:
                         print(f"  • Brouillon détecté #{r['idx'] + 1} [{r['strategy']}] : {r['signature'][:90]}")
+                    posts_info = {}
+                    try:
+                        page.goto(posts_url, wait_until="domcontentloaded", timeout=60000)
+                        time.sleep(2.5)
+                        self._dismiss_popups(page)
+                        posts_counts = self._read_studio_tab_counts(page)
+                        posts_screen = os.path.join(self.screenshots_dir, "posts_dry_run.png")
+                        page.screenshot(path=posts_screen, full_page=False)
+                        screenshots["posts_dry_run"] = posts_screen
+                        posts_info["publications"] = posts_counts["publications"]
+                        posts_info["body_preview"] = (page.inner_text("body") or "").replace("\n", " | ")[:400]
+                        print(f"📊 [DevOps-Bot] Onglet Publications (dry-run) : {posts_info['body_preview']}")
+                    except Exception as e_posts:
+                        print(f"⚠️ [DevOps-Bot] Inspection Publications ignorée ({e_posts})")
                     return {
                         "status": "dry_run",
                         "publications_before": before_counts["publications"],
                         "drafts_before": before_counts["drafts"],
                         "rows_detected": len(initial_rows),
                         "rows": initial_rows,
+                        "posts_info": posts_info,
                         "screenshots": screenshots,
                     }
 
