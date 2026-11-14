@@ -1,16 +1,30 @@
 # 🕊️ Rapport Autopilot 24/7 - Prédications & Brouillons TikTok
-**Dernière exécution :** 14/11/2026 à 21:30 GMT (Fuseau horaire GMT / Abidjan)
-**Statut :** `ERREUR : Command '['/opt/hostedtoolcache/Python/3.11.18/x64/bin/python', '-m', 'yt_dlp', '--force-ipv4', '--extractor-args', 'youtube:player_client=android_vr', '--format', 'bestvideo[height<=1080]+bestaudio/best[height<=1080]/best', '--no-playlist', '--merge-output-format', 'mp4', '--output', 'downloads/session_source_287b5066/source_%(title).40s.%(ext)s', 'https://www.youtube.com/watch?v=g2cfTnE_Hpw']' returned non-zero exit status 1.`
-**Total prédications traitées :** 0
+**Dernière exécution :** 14/11/2026 à 21:50 GMT (Fuseau horaire GMT / Abidjan)
+**Statut :** `SUCCES`
+**Total prédications traitées :** 1
 **Bibliothèque source :** [Accéder au dossier YouTube](https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ)
 
 ---
 
-## ⚠️ Incident Temporaire sur ce Cycle
-- **Prédication concernée :** Le mariage   Comment faire le bon choix Partie 1
+## 🎬 Dernière Prédication Traitée
+- **Titre :** Le mariage   Comment faire le bon choix Partie 1
 - **Lien :** [https://www.youtube.com/watch?v=g2cfTnE_Hpw](https://www.youtube.com/watch?v=g2cfTnE_Hpw)
-- **File d'attente :** La prédication reste en file d'attente et sera automatiquement retentée au prochain cycle 24/7.
-- **Suivi :** Si le blocage YouTube persiste sur plusieurs passages, ajoutez optionnellement le secret `YOUTUBE_COOKIES_TEXT` ou relancez un cycle.
+- **Durée source :** 28:00
+- **Clips extraits (1 à 2 min) :** 3
+- **Destination :** Brouillons TikTok Studio 📱
+
+### 📋 Liste des 3 Shorts Générés avec Gospel Intelligence
+| # | Durée | Accroche (Hook) | Cible Rétention | Brouillon TikTok |
+|---|---|---|---|---|
+| Clip 1 | 119s | **LE MIRACLE QUE TU ATTENDS ARRIVE ⚡** | 92% | ✅ Déposé dans Brouillons |
+| Clip 2 | 119s | **LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡** | 92% | ✅ Déposé dans Brouillons |
+| Clip 3 | 117s | **ÉCOUTE CE MESSAGE PROPHÉTIQUE 🕊️** | 92% | ✅ Déposé dans Brouillons |
+
+### 💡 Prochaine Étape pour Karl
+1. Ouvre ton application TikTok sur ton téléphone.
+2. Rends-toi dans ton profil > **Brouillons**.
+3. Les vidéos y sont déjà pré-remplies avec l'accroche, les hashtags (#mariage, #foi, #chretien) et le texte.
+4. Clique sur 'Publier' au moment où tu le souhaites !
 
 ---
 *Généré automatiquement par le CEO Multi-Agents (DevOps-Bot, Media-Bot, Growth-Bot & Gospel Intelligence)*
