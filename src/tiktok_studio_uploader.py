@@ -1,7 +1,8 @@
 import os
 import sys
 import time
-from typing import Dict, Any, Optional
+import json
+from typing import Dict, Any, Optional, List
 
 class TikTokStudioUploader:
     """
@@ -20,6 +21,146 @@ class TikTokStudioUploader:
         self.session_id = session_id or os.environ.get("TIKTOK_SESSION_ID")
         self.screenshots_dir = screenshots_dir
         os.makedirs(self.screenshots_dir, exist_ok=True)
+
+    @staticmethod
+    def parse_and_prepare_cookies(raw_value: str) -> List[Dict[str, Any]]:
+        """
+        Normalise et prépare les cookies TikTok à partir de multiples formats :
+        - Valeur brute du sessionid (ex: '7f8b9c...')
+        - Format clé=valeur (ex: 'sessionid=7f8b9c...')
+        - Chaîne d'en-tête Cookie complète (ex: 'sessionid=7f8b...; sid_tt=...; sessionid_ss=...')
+        - Export JSON (ex: Cookie-Editor: [{"name": "sessionid", "value": "..."}, ...])
+        - Détection de lien URL erroné (ex: 'https://www.tiktok.com/...')
+        """
+        if not raw_value:
+            return []
+
+        raw = raw_value.strip().strip('"').strip("'")
+        if not raw:
+            return []
+
+        # Détection d'un lien web (URL) au lieu d'un cookie
+        if raw.startswith("http://") or raw.startswith("https://") or ("tiktok.com/" in raw and "=" not in raw):
+            print(f"⚠️ [DevOps-Bot] ANOMALIE DÉTECTÉE : TIKTOK_SESSION_ID contient un LIEN WEB (URL) au lieu d'un cookie : '{raw[:40]}...'")
+            print("💡 Explication : Vous avez collé une adresse de site web (ex: lien de profil ou studio).")
+            print("👉 Vous devez coller la clé secrète du cookie 'sessionid' (ex: chaîne de caractères alphanumérique).")
+            return []
+
+        cookies = []
+
+        # Cas 1 : Export JSON (ex: Cookie-Editor extension)
+        if (raw.startswith("[") and raw.endswith("]")) or (raw.startswith("{") and raw.endswith("}")):
+            try:
+                data = json.loads(raw)
+                if isinstance(data, list):
+                    for item in data:
+                        if isinstance(item, dict) and "name" in item and "value" in item:
+                            cookies.append({
+                                "name": str(item["name"]).strip(),
+                                "value": str(item["value"]).strip(),
+                                "domain": str(item.get("domain") or ".tiktok.com").strip(),
+                                "path": str(item.get("path") or "/").strip(),
+                                "secure": True,
+                                "httpOnly": bool(item.get("httpOnly", True)),
+                                "sameSite": "Lax"
+                            })
+                elif isinstance(data, dict):
+                    for k, v in data.items():
+                        cookies.append({
+                            "name": str(k).strip(),
+                            "value": str(v).strip(),
+                            "domain": ".tiktok.com",
+                            "path": "/",
+                            "secure": True,
+                            "httpOnly": True,
+                            "sameSite": "Lax"
+                        })
+            except Exception as e_json:
+                print(f"⚠️ Erreur parsing JSON cookies : {e_json}")
+
+        # Cas 2 : Header Cookie complet (ex: sessionid=...; sid_tt=...)
+        if not cookies and ";" in raw:
+            for part in raw.split(";"):
+                part = part.strip()
+                if "=" in part:
+                    k, v = part.split("=", 1)
+                    k = k.strip()
+                    v = v.strip().strip('"').strip("'")
+                    if k and v:
+                        cookies.append({
+                            "name": k,
+                            "value": v,
+                            "domain": ".tiktok.com",
+                            "path": "/",
+                            "secure": True,
+                            "httpOnly": True,
+                            "sameSite": "Lax"
+                        })
+
+        # Cas 3 : Format clé=valeur unique (ex: sessionid=...)
+        if not cookies and "=" in raw:
+            k, v = raw.split("=", 1)
+            k = k.strip()
+            v = v.strip().strip('"').strip("'")
+            if k and v:
+                cookies.append({
+                    "name": k,
+                    "value": v,
+                    "domain": ".tiktok.com",
+                    "path": "/",
+                    "secure": True,
+                    "httpOnly": True,
+                    "sameSite": "Lax"
+                })
+                if k == "sessionid":
+                    cookies.append({
+                        "name": "sessionid_ss",
+                        "value": v,
+                        "domain": ".tiktok.com",
+                        "path": "/",
+                        "secure": True,
+                        "httpOnly": True,
+                        "sameSite": "Lax"
+                    })
+
+        # Cas 4 : Valeur brute du token sessionid seul
+        if not cookies and raw:
+            cookies = [
+                {
+                    "name": "sessionid",
+                    "value": raw,
+                    "domain": ".tiktok.com",
+                    "path": "/",
+                    "secure": True,
+                    "httpOnly": True,
+                    "sameSite": "Lax"
+                },
+                {
+                    "name": "sessionid_ss",
+                    "value": raw,
+                    "domain": ".tiktok.com",
+                    "path": "/",
+                    "secure": True,
+                    "httpOnly": True,
+                    "sameSite": "Lax"
+                }
+            ]
+
+        # S'assurer que sessionid_ss est toujours présent si sessionid existe
+        cookie_names = {c["name"] for c in cookies}
+        if "sessionid" in cookie_names and "sessionid_ss" not in cookie_names:
+            s_val = next(c["value"] for c in cookies if c["name"] == "sessionid")
+            cookies.append({
+                "name": "sessionid_ss",
+                "value": s_val,
+                "domain": ".tiktok.com",
+                "path": "/",
+                "secure": True,
+                "httpOnly": True,
+                "sameSite": "Lax"
+            })
+
+        return cookies
 
     def _dismiss_popups(self, page) -> None:
         """Ferme les bannières de cookies, guides d'utilisation et alertes superposées."""
@@ -127,29 +268,16 @@ class TikTokStudioUploader:
             """)
 
             # 2. Injection du cookie de session sécurisé
-            clean_sid = self.session_id.strip()
-            cookies = [
-                {
-                    "name": "sessionid",
-                    "value": clean_sid,
-                    "domain": ".tiktok.com",
-                    "path": "/",
-                    "secure": True,
-                    "httpOnly": True,
-                    "sameSite": "Lax"
-                },
-                {
-                    "name": "sessionid_ss",
-                    "value": clean_sid,
-                    "domain": ".tiktok.com",
-                    "path": "/",
-                    "secure": True,
-                    "httpOnly": True,
-                    "sameSite": "Lax"
+            cookies = self.parse_and_prepare_cookies(self.session_id)
+            if not cookies:
+                return {
+                    "status": "auth_error",
+                    "error": "Aucun cookie TikTok valide trouvé dans TIKTOK_SESSION_ID. Vérifiez que vous avez copié la valeur alphanumérique du cookie 'sessionid' et non un lien web (URL)."
                 }
-            ]
+
             context.add_cookies(cookies)
-            print("🔑 [DevOps-Bot] Cookies de session TikTok injectés avec succès.")
+            cookie_names = [c["name"] for c in cookies]
+            print(f"🔑 [DevOps-Bot] {len(cookies)} cookies de session TikTok injectés avec succès ({', '.join(cookie_names)}).")
 
             page = context.new_page()
             page.set_default_timeout(45000)

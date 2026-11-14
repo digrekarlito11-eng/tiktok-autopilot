@@ -20,11 +20,9 @@
 | Clip 2 | 119s | **LE MIRACLE QUE TU ATTENDS ARRIVE ⚡** | 92% | 📁 Fichier Prêt (En attente Session) |
 | Clip 3 | 118s | **ÉCOUTE CE MESSAGE PROPHÉTIQUE 🕊️** | 92% | 📁 Fichier Prêt (En attente Session) |
 
-### 💡 Prochaine Étape pour Karl
-1. Ouvre ton application TikTok sur ton téléphone.
-2. Rends-toi dans ton profil > **Brouillons**.
-3. Les vidéos y sont déjà pré-remplies avec l'accroche, les hashtags (#mariage, #foi, #chretien) et le texte.
-4. Clique sur 'Publier' au moment où tu le souhaites !
+### 💡 Diagnostic & Prochaine Étape pour Karl
+1. **Tes 3 vidéos sont 100% générées et archivées :** Tu peux télécharger l'archive zip complète (95 Mo avec les 3 clips MP4 et leurs fiches) directement depuis les [Artéfacts GitHub Actions (Run 43634738118)](https://github.com/digrekarlito11-eng/tiktok-autopilot/actions/runs/43634738118).
+2. **Pour l'injection 100% automatique dans tes Brouillons TikTok :** Le secret `TIKTOK_SESSION_ID` contenait un lien URL au lieu de la clé secrète du cookie. Remplace-le par la valeur du cookie `sessionid` de ton compte TikTok pour que le robot virtuel puisse valider la connexion TikTok Studio.
 
 ---
 *Généré automatiquement par le CEO Multi-Agents (DevOps-Bot, Media-Bot, Growth-Bot & Gospel Intelligence)*

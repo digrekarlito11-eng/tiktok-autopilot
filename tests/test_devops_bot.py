@@ -344,3 +344,36 @@ def test_main_cli_missing_source_exits():
         with pytest.raises(SystemExit) as excinfo:
             main.main()
         assert excinfo.value.code == 1
+
+
+def test_parse_and_prepare_cookies_various_formats():
+    """Vérifie la robustesse du parseur de cookies multi-formats et la détection d'URL."""
+    from src.tiktok_studio_uploader import TikTokStudioUploader
+
+    # 1. Raw token
+    c1 = TikTokStudioUploader.parse_and_prepare_cookies("a1b2c3d4e5")
+    assert len(c1) == 2
+    assert c1[0]["name"] == "sessionid"
+    assert c1[0]["value"] == "a1b2c3d4e5"
+    assert c1[1]["name"] == "sessionid_ss"
+
+    # 2. Key=value
+    c2 = TikTokStudioUploader.parse_and_prepare_cookies("sessionid=test_value_123")
+    assert len(c2) == 2
+    assert c2[0]["value"] == "test_value_123"
+
+    # 3. Multi-cookie header
+    c3 = TikTokStudioUploader.parse_and_prepare_cookies("sessionid=val1; sid_tt=val2; uid_tt=val3")
+    assert len(c3) == 4
+    names = [c["name"] for c in c3]
+    assert "sessionid" in names and "sessionid_ss" in names and "sid_tt" in names
+
+    # 4. JSON
+    c4 = TikTokStudioUploader.parse_and_prepare_cookies('[{"name": "sessionid", "value": "json_val"}]')
+    assert len(c4) == 2
+    assert c4[0]["value"] == "json_val"
+
+    # 5. Invalid URL
+    c5 = TikTokStudioUploader.parse_and_prepare_cookies("https://www.tiktok.com/tiktokstudio/upload")
+    assert c5 == []
+
