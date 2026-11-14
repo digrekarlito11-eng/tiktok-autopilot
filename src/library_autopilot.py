@@ -26,7 +26,7 @@ class LibraryAutopilot:
     - Fait tourner le sous-agent 'Gospel Intelligence' pour extraire les 10 meilleurs
       segments de 1 à 2 min (60s à 120s) calibrés pour les vérités bibliques et de vie.
     - Met en forme en 9:16 vertical (Thème Gospel Gold + Sous-titres dynamiques + Safe-Zone).
-    - Dépose directement les 10 vidéos dans les Brouillons de TikTok Studio pour vérification par Karl.
+    - Publie directement les 10 vidéos sur TikTok (ou les dépose en Brouillons selon le mode).
     - Mémorise l'historique dans history/processed_videos.json pour ne jamais retraiter la même vidéo.
     """
 
@@ -38,7 +38,7 @@ class LibraryAutopilot:
         output_dir: str = "output",
         theme: str = "gospel",
         watermark: str = "@parole.de.foi",
-        publish_mode: str = "draft",
+        publish_mode: str = "public",
         clips_count: int = 10
     ):
         self.playlist_url = playlist_url
@@ -151,9 +151,10 @@ class LibraryAutopilot:
         """Génère un rapport lisible pour Karl visible directement sur GitHub."""
         now_str = datetime.now(timezone.utc).strftime("%d/%m/%Y à %H:%M GMT")
         total_p = len(self.history_data.get("processed_video_ids", []))
+        mode_title = "Publications TikTok" if self.publish_mode == "public" else "Brouillons TikTok"
 
         lines = [
-            "# 🕊️ Rapport Autopilot 24/7 - Prédications & Brouillons TikTok",
+            f"# 🕊️ Rapport Autopilot 24/7 - Prédications & {mode_title}",
             f"**Dernière exécution :** {now_str} (Fuseau horaire GMT / Abidjan)",
             f"**Statut :** `{status}`",
             f"**Total prédications traitées :** {total_p}",
@@ -164,16 +165,26 @@ class LibraryAutopilot:
         ]
 
         if last_video and clips_info:
+            if self.publish_mode == "public":
+                dest_text = "Publication Directe sur TikTok 🚀"
+                col_status = "Publication TikTok"
+            elif self.publish_mode == "none":
+                dest_text = "Archive Locale (Sans publication) 📦"
+                col_status = "Archive Locale"
+            else:
+                dest_text = "Brouillons TikTok Studio 📱"
+                col_status = "Brouillon TikTok"
+
             lines.extend([
                 "## 🎬 Dernière Prédication Traitée",
                 f"- **Titre :** {last_video.get('title')}",
                 f"- **Lien :** [{last_video.get('url')}]({last_video.get('url')})",
                 f"- **Durée source :** {last_video.get('duration_string', str(last_video.get('duration', '')) + 's')}",
                 f"- **Clips extraits (1 à 2 min) :** {len(clips_info)}",
-                "- **Destination :** Brouillons TikTok Studio 📱",
+                f"- **Destination :** {dest_text}",
                 "",
                 f"### 📋 Liste des {len(clips_info)} Shorts Générés avec Gospel Intelligence",
-                "| # | Durée | Accroche (Hook) | Cible Rétention | Brouillon TikTok |",
+                f"| # | Durée | Accroche (Hook) | Cible Rétention | {col_status} |",
                 "|---|---|---|---|---|"
             ])
 
@@ -197,9 +208,10 @@ class LibraryAutopilot:
                 )
 
             if status == "EN_ATTENTE_SESSION":
+                target_dest_phrase = "sur ton TikTok" if self.publish_mode == "public" else "dans tes Brouillons TikTok"
                 lines.extend([
                     "",
-                    "### 🔑 Action requise pour déposer automatiquement dans tes Brouillons TikTok",
+                    f"### 🔑 Action requise pour publier automatiquement {target_dest_phrase}",
                     "Les vidéos et fiches textes ont bien été générées et archivées dans GitHub Actions, mais TikTok a demandé une reconnexion.",
                     "1. Connecte-toi à **TikTok Studio** dans Chrome/Edge, ouvre **Cookie-Editor** et clique sur **Export > Export as JSON**.",
                     "2. Colle ce texte JSON dans le Secret GitHub `TIKTOK_SESSION_ID` (Paramètres > Secrets > Actions).",
@@ -210,8 +222,17 @@ class LibraryAutopilot:
                 lines.extend([
                     "",
                     "### 💡 Récupération & Vérification pour Karl",
-                    "Les vidéos montées et leurs fiches textes restent téléchargeables immédiatement dans l'archive `tiktok-brouillons-autopilot` de cette exécution GitHub Actions.",
+                    "Les vidéos montées et leurs fiches textes restent téléchargeables immédiatement dans l'archive `tiktok-autopilot-outputs` de cette exécution GitHub Actions.",
                     "La prédication sera automatiquement retentée lors du prochain cycle.",
+                    ""
+                ])
+            elif self.publish_mode == "public":
+                lines.extend([
+                    "",
+                    "### 🚀 Publication Directe Activée pour Karl",
+                    "1. Ouvre ton profil TikTok : les Shorts validés sont déjà en ligne sur ton fil public !",
+                    "2. Chaque vidéo contient son accroche visuelle, ses sous-titres Gospel Gold et ses hashtags (#mariage, #foi, #chretien).",
+                    "3. L'Autopilot continuera automatiquement au prochain cycle (06h00 & 18h00 GMT).",
                     ""
                 ])
             else:
@@ -419,12 +440,12 @@ class LibraryAutopilot:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Autopilot 24/7 Bibliothèque YouTube -> Brouillons TikTok Studio")
+    parser = argparse.ArgumentParser(description="Autopilot 24/7 Bibliothèque YouTube -> Publication Directe TikTok")
     parser.add_argument("--playlist", type=str, default=DEFAULT_PLAYLIST_URL, help="URL de la bibliothèque YouTube")
     parser.add_argument("--clips", type=int, default=10, help="Nombre de clips de 1-2 min à extraire")
     parser.add_argument("--theme", type=str, default="gospel", help="Thème visuel (gospel, gold, neon, minimal)")
     parser.add_argument("--watermark", type=str, default="@parole.de.foi", help="Identifiant safe-zone")
-    parser.add_argument("--publish", type=str, default="draft", choices=["draft", "public", "none"], help="Mode publication TikTok")
+    parser.add_argument("--publish", type=str, default="public", choices=["draft", "public", "none"], help="Mode publication TikTok")
     parser.add_argument("--force-id", type=str, default=None, help="Forcer le traitement d'une vidéo spécifique")
     parser.add_argument("--dry-run", action="store_true", help="Simule la détection sans effectuer le rendu")
 

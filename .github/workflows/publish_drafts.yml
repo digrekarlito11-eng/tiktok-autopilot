@@ -1,0 +1,62 @@
+name: 🚀 Publier les Brouillons TikTok Studio en Public
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_drafts:
+        description: "🔢 Nombre maximal de brouillons à publier"
+        required: false
+        default: "30"
+        type: string
+      pause_seconds:
+        description: "⏱️ Pause (en secondes) entre chaque publication"
+        required: false
+        default: "3"
+        type: string
+      dry_run:
+        description: "🔍 Simulation (compter/inspecter les brouillons sans cliquer sur Publier)"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  publish-drafts:
+    name: 📱 Transfert des Brouillons vers TikTok Public
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Récupération du dépôt
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Configuration de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: 📦 Installation de Playwright & Chromium
+        run: |
+          pip install --upgrade pip
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: 🚀 Publication des Brouillons TikTok Studio en Public
+        env:
+          TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
+          MAX_DRAFTS: ${{ github.event.inputs.max_drafts || '30' }}
+          PAUSE_SECONDS: ${{ github.event.inputs.pause_seconds || '3' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: |
+          cmd=(python -m src.draft_publisher --max "$MAX_DRAFTS" --pause "$PAUSE_SECONDS")
+          if [ "$DRY_RUN" = "true" ]; then
+            cmd+=(--dry-run)
+          fi
+          "${cmd[@]}"
+
+      - name: 📸 Archivage des Captures & Rapport de Publication
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tiktok-drafts-published
+          path: output/draft_screenshots/
+          retention-days: 14

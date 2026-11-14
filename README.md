@@ -4,12 +4,12 @@
 [![TikTok Format](https://img.shields.io/badge/Format-9%3A16%20Vertical%201080x1920-fe2c55?logo=tiktok)](https://tiktok.com)
 [![Durée Monétisation](https://img.shields.io/badge/Dur%C3%A9e-1%20%C3%A0%202%20Minutes%20%28Mon%C3%A9tisable%29-gold)](#)
 [![Gospel Intelligence](https://img.shields.io/badge/Intelligence-Gospel%20AI%20%280%E2%82%AC%20API%29-blue)](#)
-[![Destination](https://img.shields.io/badge/Destination-Brouillons%20TikTok%20Studio-green)](#)
+[![Destination](https://img.shields.io/badge/Destination-Publication%20Directe%20TikTok-fe2c55)](#)
 [![Zone Horaires](https://img.shields.io/badge/Audience-C%C3%B4te%20d'Ivoire%20%28Abidjan%20GMT%29-orange)](#)
 [![Propriétaire](https://img.shields.io/badge/Propri%C3%A9taire-Karl-brightgreen)](#)
 
 > **TikTok Autopilot 24/7** est la société autonome de création de contenu vidéo opérant au service de **Karl** (Abidjan, Côte d'Ivoire).
-> Le système fonctionne **24H/24 en totale indépendance dans le Cloud**, scanne automatiquement la bibliothèque YouTube de Karl, extrait les **10 meilleurs segments de 1 à 2 minutes (60s à 120s)** à fort impact spirituel, les met en valeur au format vertical 9:16 (Thème Gospel Gold avec barre animée et sous-titres Safe-Zone) et les transfère directement dans les **Brouillons TikTok Studio** de Karl pour validation finale sur smartphone.
+> Le système fonctionne **24H/24 en totale indépendance dans le Cloud**, scanne automatiquement la bibliothèque YouTube de Karl, extrait les **10 meilleurs segments de 1 à 2 minutes (60s à 120s)** à fort impact spirituel, les met en valeur au format vertical 9:16 (Thème Gospel Gold avec barre animée et sous-titres Safe-Zone) et les **publie directement sur le fil public TikTok** de Karl (ou en Brouillons si choisi manuellement).
 
 ---
 
@@ -25,7 +25,7 @@
   • Serveur Cloud 24/7        • Scanner Bibliothèque      • Gospel Intelligence
   • GitHub Actions Cron       • yt-dlp & Whisper          • 5 Archétypes Prédicateurs
   • Navigateur Furtif         • Rendu 9:16 (FFmpeg)       • Aimants à Commentaires
-  • Dépôt Brouillons TikTok   • Safe-Zone & Barre Or      • Heures de Pointe Abidjan
+  • Publication Directe TikTok• Safe-Zone & Barre Or      • Heures de Pointe Abidjan
 ```
 
 ---
@@ -33,8 +33,8 @@
 ## ⏰ Comment Fonctionne l'Autopilot 24/7 ?
 
 ### 1. Cycle Automatique Quotidien (Heure d'Abidjan / GMT)
-- **🌅 À 06h00 GMT** : L'Autopilot se réveille dans le Cloud, prend la prédication suivante dans la bibliothèque YouTube de Karl, extrait les **10 clips de 1 à 2 min**, les habille en format vertical 9:16 (*Thème Gospel Gold avec sous-titres animés et barre dorée*) et les envoie dans les **Brouillons TikTok**.
-- **🌙 À 18h00 GMT** : Deuxième passage autonome pour préparer le stock de la soirée et du lendemain matin.
+- **🌅 À 06h00 GMT** : L'Autopilot se réveille dans le Cloud, prend la prédication suivante dans la bibliothèque YouTube de Karl, extrait les **10 clips de 1 à 2 min**, les habille en format vertical 9:16 (*Thème Gospel Gold avec sous-titres animés et barre dorée*) et les **publie directement sur TikTok**.
+- **🌙 À 18h00 GMT** : Deuxième passage autonome pour la programmation du soir.
 
 ### 2. Indépendance Totale & Zéro Contrainte
 - **L'ordinateur de Karl peut être éteint, déconnecté ou fermé.** Les serveurs virtuels de GitHub Actions exécutent l'intégralité du travail dans le Cloud sans consommer la batterie ni la bande passante de Karl.
@@ -70,7 +70,7 @@ Pourquoi 1 à 2 minutes (60s à 120s) ?
 
 ---
 
-## 📱 Le Flux Mobile pour Karl
+## 📱 Le Flux Autonome pour Karl
 
 ```
 1. Karl ajoute un lien dans sa Playlist YouTube (sur smartphone ou PC)
@@ -82,13 +82,11 @@ Pourquoi 1 à 2 minutes (60s à 120s) ?
    • Media-Bot façonne les 10 vidéos verticales 9:16 (Gospel Gold)
    • DevOps-Bot ouvre TikTok Studio en sous-marin avec Playwright
    • Colle la description optimisée SEO (#chretien #cotedivoire #abidjan...)
-   • Clique sur "Enregistrer comme brouillon"
+   • Clique sur "Publier" (Publication Directe)
                                   │
                                   ▼
-3. Karl ouvre TikTok sur son téléphone > Profil > Brouillons 📱
-   • Les 10 vidéos sont là, impeccablement prêtes !
-   • Karl peut écouter, éventuellement ajouter une musique tendance
-   • Clique sur "Publier" quand il le décide !
+3. Les 10 Shorts sont directement en ligne sur le TikTok de Karl 🚀
+   • Visibilité immédiate sur le fil public sans action manuelle !
 ```
 
 ---
@@ -107,7 +105,8 @@ Pourquoi 1 à 2 minutes (60s à 120s) ?
 Si Karl souhaite lancer un cycle immédiatement sans attendre le réveil programmé de 06h00 ou 18h00 :
 1. Ouvre la page : **[Lancer le Cycle Autopilot 24/7](https://github.com/digrekarlito11-eng/tiktok-autopilot/actions/workflows/autopilot_247.yml)**.
 2. Clique sur **Run workflow** > bouton vert **Run workflow**.
-3. Le robot effectue tout le travail et dépose les 10 vidéos dans tes brouillons en ~10 minutes.
+3. Le robot effectue tout le travail et publie les 10 vidéos directement sur ton compte TikTok.
+4. Pour vider/publier d'anciens brouillons TikTok Studio : **[Publier les Brouillons TikTok Studio](https://github.com/digrekarlito11-eng/tiktok-autopilot/actions/workflows/publish_drafts.yml)**.
 
 ---
 

@@ -1,4 +1,4 @@
-name: 🕊️ Autopilot 24/7 - Prédications & Brouillons TikTok
+name: 🕊️ Autopilot 24/7 - Prédications & Publications TikTok
 
 on:
   schedule:
@@ -35,11 +35,11 @@ on:
       publish_mode:
         description: "📱 Publication TikTok Studio"
         required: false
-        default: "draft"
+        default: "public"
         type: choice
         options:
-          - "draft"
           - "public"
+          - "draft"
           - "none"
       dry_run:
         description: "🔍 Test de simulation uniquement (sans téléchargement ni découpage)"
@@ -102,7 +102,7 @@ jobs:
           pip install --upgrade yt-dlp
           playwright install --with-deps chromium
 
-      - name: 🚀 Exécution de l'Autopilot 24/7 (Bibliothèque YouTube -> TikTok Studio)
+      - name: 🚀 Exécution de l'Autopilot 24/7 (Bibliothèque YouTube -> TikTok Public)
         env:
           TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
           TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
@@ -110,7 +110,7 @@ jobs:
           FORCE_VIDEO_ID: ${{ github.event.inputs.force_video_id }}
           CLIPS_COUNT: ${{ github.event.inputs.clips_count || '10' }}
           THEME: ${{ github.event.inputs.theme || 'gospel' }}
-          PUBLISH_MODE: ${{ github.event.inputs.publish_mode || 'draft' }}
+          PUBLISH_MODE: ${{ github.event.inputs.publish_mode || 'public' }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
           USE_WARP: ${{ github.event.inputs.use_warp || 'true' }}
           ABORT_IF_YOUTUBE_BLOCKED: "1"
@@ -143,7 +143,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: tiktok-brouillons-autopilot
+          name: tiktok-autopilot-outputs
           path: output/
           retention-days: 14
 
@@ -203,7 +203,7 @@ jobs:
           FORCE_VIDEO_ID: ${{ github.event.inputs.force_video_id }}
           CLIPS_COUNT: ${{ github.event.inputs.clips_count || '10' }}
           THEME: ${{ github.event.inputs.theme || 'gospel' }}
-          PUBLISH_MODE: ${{ github.event.inputs.publish_mode || 'draft' }}
+          PUBLISH_MODE: ${{ github.event.inputs.publish_mode || 'public' }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
           USE_WARP: ${{ github.event.inputs.use_warp || 'true' }}
           ABORT_IF_YOUTUBE_BLOCKED: "0"
@@ -233,6 +233,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: tiktok-brouillons-autopilot
+          name: tiktok-autopilot-outputs
           path: output/
           retention-days: 14

@@ -81,4 +81,13 @@ En acceptant ce mandat, le **CEO et l'ensemble de ses sous-agents** s'engagent f
 - Préserver la confidentialité absolue des accès et identifiants de Karl via les Secrets GitHub.
 - Servir avec excellence, précision et persévérance la vision de diffusion de la foi chrétienne portée par Karl en Côte d'Ivoire et dans le monde francophone.
 
+---
+
+## 🚀 5. Amendement Officiel : Autorisation de Publication Directe sur TikTok
+
+> *"JE TE DONNE MAINTENANT L'AURISATION DE PUBLIER DIRECTEMENT TOUTES LES SHORTS DANS MON TIKTOK AINSI QUE LES 22 DEJA DANS LE BROUILLON. ALLEZ S'Y CEO"*
+
+- **Mode par défaut actif :** `publish_mode: "public"` (Publication Directe sur le fil public TikTok dès la génération).
+- **Workflow dédié aux brouillons :** [`.github/workflows/publish_drafts.yml`](.github/workflows/publish_drafts.yml) permet de convertir en publications publiques tous les brouillons déjà présents dans TikTok Studio.
+
 *Fait à Abidjan & dans le Cloud, validé et scellé pour exécution immédiate et continue.*

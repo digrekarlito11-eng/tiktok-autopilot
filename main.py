@@ -80,7 +80,7 @@ def main():
     parser.add_argument("--output", type=str, default="output", help="Dossier de sortie des vidéos TikTok")
     parser.add_argument("--theme", type=str, default="gospel", choices=["gospel", "gold", "neon", "minimal"], help="Thème visuel (gospel, gold, neon, minimal)")
     parser.add_argument("--watermark", type=str, default="@parole.de.foi", help="Badge / Watermark dans la Safe Zone")
-    parser.add_argument("--publish", type=str, default="draft", choices=["none", "draft", "public"], help="Mode de publication TikTok (none, draft=Brouillon privé, public=Publication directe)")
+    parser.add_argument("--publish", type=str, default="public", choices=["none", "draft", "public"], help="Mode de publication TikTok (none, draft=Brouillon privé, public=Publication directe)")
     parser.add_argument("--no-progress-bar", action="store_true", help="Désactiver la barre de progression en bas")
     parser.add_argument("--webhook", type=str, help="URL de notification Webhook Discord ou Telegram")
     parser.add_argument("--demo", action="store_true", help="Lancer un test complet avec une vidéo de démo")

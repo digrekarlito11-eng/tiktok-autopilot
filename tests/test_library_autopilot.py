@@ -75,7 +75,8 @@ def test_generate_markdown_report(tmp_path):
 
     bot = LibraryAutopilot(
         history_path=history_file,
-        report_path=report_file
+        report_path=report_file,
+        publish_mode="draft"
     )
 
     sample_video = {
@@ -102,6 +103,40 @@ def test_generate_markdown_report(tmp_path):
     assert "La Guérison de l'Âme - Ps Juliana Ondo" in content
     assert "DIEU A VU TES LARMES CACHÉES" in content
     assert "Brouillons TikTok Studio" in content
+
+
+def test_generate_markdown_report_public_mode(tmp_path):
+    history_file = str(tmp_path / "history.json")
+    report_file = str(tmp_path / "REPORT.md")
+
+    bot = LibraryAutopilot(
+        history_path=history_file,
+        report_path=report_file
+    )
+    assert bot.publish_mode == "public"
+
+    sample_video = {
+        "id": "pub123",
+        "title": "La Puissance de la Prière",
+        "url": "https://youtube.com/watch?v=pub123",
+        "duration_string": "45:00"
+    }
+    sample_clips = [
+        {
+            "clip_number": 1,
+            "duration": 92.0,
+            "hook": "TA VICTOIRE EST PROCHE DÉCLARE-LE ⚔️",
+            "retention": "92%",
+            "publication": {"status": "success"}
+        }
+    ]
+
+    bot.generate_markdown_report(status="SUCCES", last_video=sample_video, clips_info=sample_clips)
+    with open(report_file, "r", encoding="utf-8") as f:
+        content = f.read()
+    assert "Publication Directe sur TikTok 🚀" in content
+    assert "✅ Publié sur TikTok" in content
+    assert "Publication Directe Activée" in content
 
 
 def test_run_cycle_does_not_mark_processed_on_auth_error(tmp_path):

@@ -578,9 +578,322 @@ def test_workflow_autopilot_247_yaml_validity():
     inputs = data[on_key]["workflow_dispatch"]["inputs"]
     assert "use_warp" in inputs
     assert inputs["use_warp"]["default"] is True
+    assert inputs["publish_mode"]["default"] == "public"
+
+    for job_name in ("autopilot-cycle", "autopilot-cycle-arm"):
+        steps = data["jobs"][job_name]["steps"]
+        run_step = next(s for s in steps if "Exécution" in s.get("name", ""))
+        assert "'public'" in run_step["env"]["PUBLISH_MODE"]
 
     steps = data["jobs"]["autopilot-cycle"]["steps"]
     history_step = next(s for s in steps if "Historique" in s.get("name", ""))
     assert "git pull --rebase origin main" in history_step["run"]
+
+
+def test_workflow_publish_drafts_and_generate_public_defaults():
+    """Vérifie la validité YAML de publish_drafts.yml et la valeur par défaut public de generate_tiktok.yml."""
+    import yaml
+
+    root = Path(__file__).resolve().parent.parent
+    gen_path = root / ".github" / "workflows" / "generate_tiktok.yml"
+    pub_drafts_path = root / ".github" / "workflows" / "publish_drafts.yml"
+    assert gen_path.exists()
+    assert pub_drafts_path.exists()
+
+    with open(gen_path, "r", encoding="utf-8") as f:
+        gen_data = yaml.safe_load(f)
+    gen_on = True if True in gen_data else "on"
+    assert gen_data[gen_on]["workflow_dispatch"]["inputs"]["publish_mode"]["default"] == "public"
+
+    with open(pub_drafts_path, "r", encoding="utf-8") as f:
+        pub_data = yaml.safe_load(f)
+    pub_on = True if True in pub_data else "on"
+    pub_inputs = pub_data[pub_on]["workflow_dispatch"]["inputs"]
+    assert pub_inputs["max_drafts"]["default"] == "30"
+    assert "publish-drafts" in pub_data["jobs"]
+
+
+def test_tiktok_studio_uploader_public_mode_escape_and_modal_mock(tmp_path):
+    """Vérifie le mode public (Escape menu hashtag, clic Publier, modale de confirmation) avec Playwright simulé."""
+    import types
+    from src.tiktok_studio_uploader import TikTokStudioUploader
+
+    video_file = tmp_path / "clip_pub.mp4"
+    video_file.write_bytes(b"MP4DATA")
+    screens_dir = tmp_path / "screens_pub"
+
+    class FakePublicLocator:
+        def __init__(self, selector, page):
+            self.selector = selector
+            self.page = page
+
+        def count(self):
+            if self.selector in ("input[type='file']", ".public-DraftEditor-content", "button[data-e2e='post_video_button']"):
+                return 1
+            if self.selector == "div[role='dialog'] button:has-text('Publier maintenant')" and self.page.modal_open:
+                return 1
+            return 0
+
+        @property
+        def first(self):
+            return self
+
+        def nth(self, idx):
+            return self
+
+        def wait_for(self, **kwargs):
+            return None
+
+        def is_visible(self):
+            if self.selector == "button[data-e2e='post_video_button']" and self.page.published:
+                return False
+            return self.count() > 0
+
+        def set_input_files(self, path):
+            self.page.uploaded_path = path
+
+        def scroll_into_view_if_needed(self):
+            return None
+
+        def evaluate(self, script):
+            return None
+
+        def get_attribute(self, attr):
+            return None
+
+        def click(self, **kwargs):
+            if self.selector == "button[data-e2e='post_video_button']":
+                self.page.modal_open = True
+            elif "Publier maintenant" in self.selector:
+                self.page.modal_open = False
+                self.page.published = True
+                self.page.url = "https://www.tiktok.com/tiktokstudio/content"
+
+    class FakePublicPage:
+        def __init__(self):
+            self.url = "about:blank"
+            self.frames = []
+            self.modal_open = False
+            self.published = False
+            self.uploaded_path = None
+            self.keyboard = MagicMock()
+
+        def set_default_timeout(self, ms):
+            pass
+
+        def on(self, event, cb):
+            pass
+
+        def goto(self, url, **kwargs):
+            self.url = url
+
+        def title(self):
+            return "TikTok Studio"
+
+        def locator(self, sel):
+            return FakePublicLocator(sel, self)
+
+        def inner_text(self, sel):
+            if self.published:
+                return "Votre vidéo est en cours de publication sur TikTok"
+            return "100% Téléchargé"
+
+        def evaluate(self, script):
+            return None
+
+        def screenshot(self, path, **kwargs):
+            Path(path).write_bytes(b"PNG")
+
+    fake_page = FakePublicPage()
+    fake_context = MagicMock()
+    fake_context.new_page.return_value = fake_page
+    fake_browser = MagicMock()
+    fake_browser.version = "131.0.6778.85"
+    fake_browser.new_context.return_value = fake_context
+    fake_p = MagicMock()
+    fake_p.chromium.launch.return_value = fake_browser
+    fake_cm = MagicMock()
+    fake_cm.__enter__.return_value = fake_p
+    fake_cm.__exit__.return_value = False
+
+    fake_sync_mod = types.ModuleType("playwright.sync_api")
+    fake_sync_mod.sync_playwright = lambda: fake_cm
+    fake_pw_mod = types.ModuleType("playwright")
+    fake_pw_mod.sync_api = fake_sync_mod
+
+    cookies_json = json.dumps([{"name": "sessionid", "value": "sess"}, {"name": "sid_tt", "value": "sid"}])
+
+    with patch.dict(sys.modules, {"playwright": fake_pw_mod, "playwright.sync_api": fake_sync_mod}):
+        with patch("time.sleep", return_value=None):
+            uploader = TikTokStudioUploader(session_id=cookies_json, screenshots_dir=str(screens_dir))
+            res = uploader.upload(str(video_file), "Message fort #jesus", mode="public")
+
+    assert res["status"] == "success"
+    assert res["mode"] == "public"
+    assert res["action_clicked"] is True
+    assert res["success_detected"] is True
+    fake_page.keyboard.press.assert_any_call("Escape")
+    assert fake_page.published is True
+
+
+def test_publish_all_drafts_multi_and_skip_failing_row_mock(tmp_path):
+    """Vérifie publish_all_drafts : boucle sur les brouillons, saut d'une ligne bloquée et bilan final."""
+    import types
+    from src.tiktok_studio_uploader import TikTokStudioUploader
+
+    screens_dir = tmp_path / "draft_screens"
+
+    class FakeDraftsLocator:
+        def __init__(self, selector, page):
+            self.selector = selector
+            self.page = page
+
+        def count(self):
+            if self.selector.startswith("[data-autopilot-edit-idx='"):
+                idx = int(self.selector.split("'")[1])
+                return 1 if (not self.page.in_editor and idx < len(self.page.draft_rows)) else 0
+            if self.selector == "button[data-e2e='post_video_button']" and self.page.in_editor:
+                return 1
+            return 0
+
+        @property
+        def first(self):
+            return self
+
+        def nth(self, idx):
+            return self
+
+        def is_visible(self):
+            return self.count() > 0
+
+        def scroll_into_view_if_needed(self):
+            return None
+
+        def get_attribute(self, attr):
+            return None
+
+        def click(self, **kwargs):
+            if self.selector.startswith("[data-autopilot-edit-idx='"):
+                idx = int(self.selector.split("'")[1])
+                self.page.active_draft = self.page.draft_rows[idx]
+                self.page.in_editor = True
+                self.page.url = "https://www.tiktok.com/tiktokstudio/upload?from=draft"
+            elif self.selector == "button[data-e2e='post_video_button']":
+                sig = self.page.active_draft["signature"]
+                if "Bloqué" in sig:
+                    # Reste sur place sans confirmation pour simuler une ligne en échec
+                    return
+                self.page.draft_rows = [r for r in self.page.draft_rows if r["signature"] != sig]
+                self.page.published_count += 1
+                self.page.in_editor = False
+                self.page.url = "https://www.tiktok.com/tiktokstudio/content?tab=draft"
+
+    class FakeDraftsPage:
+        def __init__(self):
+            self.url = "about:blank"
+            self.in_editor = False
+            self.published_count = 0
+            self.active_draft = None
+            self.draft_rows = [
+                {"idx": 0, "signature": "Brouillon 1 #foi 22:54", "strategy": "explicit"},
+                {"idx": 1, "signature": "Brouillon Bloqué 22:50", "strategy": "explicit"},
+                {"idx": 2, "signature": "Brouillon 3 #mariage 22:48", "strategy": "explicit"},
+            ]
+
+        def set_default_timeout(self, ms):
+            pass
+
+        def on(self, event, cb):
+            pass
+
+        def goto(self, url, **kwargs):
+            self.url = url
+            if "content" in url:
+                self.in_editor = False
+
+        def reload(self, **kwargs):
+            pass
+
+        def locator(self, sel):
+            return FakeDraftsLocator(sel, self)
+
+        def inner_text(self, sel):
+            if self.in_editor:
+                return "Paramètres Quand publier"
+            return f"Publications {self.published_count}\nBrouillons {len(self.draft_rows)}"
+
+        def evaluate(self, script):
+            if "findEditTargetInRow" in script:
+                return [
+                    {"idx": i, "signature": r["signature"], "strategy": r["strategy"]}
+                    for i, r in enumerate(self.draft_rows)
+                ]
+            return None
+
+        def screenshot(self, path, **kwargs):
+            Path(path).write_bytes(b"PNG")
+
+    fake_page = FakeDraftsPage()
+    fake_context = MagicMock()
+    fake_context.new_page.return_value = fake_page
+    fake_context.pages = [fake_page]
+    fake_browser = MagicMock()
+    fake_browser.version = "131.0.6778.85"
+    fake_browser.new_context.return_value = fake_context
+    fake_p = MagicMock()
+    fake_p.chromium.launch.return_value = fake_browser
+    fake_cm = MagicMock()
+    fake_cm.__enter__.return_value = fake_p
+    fake_cm.__exit__.return_value = False
+
+    fake_sync_mod = types.ModuleType("playwright.sync_api")
+    fake_sync_mod.sync_playwright = lambda: fake_cm
+    fake_pw_mod = types.ModuleType("playwright")
+    fake_pw_mod.sync_api = fake_sync_mod
+
+    cookies_json = json.dumps([{"name": "sessionid", "value": "sess"}, {"name": "sid_tt", "value": "sid"}])
+
+    with patch.dict(sys.modules, {"playwright": fake_pw_mod, "playwright.sync_api": fake_sync_mod}):
+        with patch("time.sleep", return_value=None):
+            uploader = TikTokStudioUploader(session_id=cookies_json, screenshots_dir=str(screens_dir))
+            res = uploader.publish_all_drafts(max_count=10, pause_seconds=0.0)
+
+    assert res["status"] == "partial_success"
+    assert res["publications_before"] == 0
+    assert res["drafts_before"] == 3
+    assert res["published_count"] == 2
+    assert res["failed_count"] == 1
+    assert res["publications_after"] == 2
+    assert res["drafts_after"] == 1
+    assert (screens_dir / "drafts_before.png").exists()
+    assert (screens_dir / "drafts_after.png").exists()
+    assert (screens_dir / "posts_after.png").exists()
+
+
+def test_draft_publisher_cli_writes_report_and_handles_empty(tmp_path):
+    """Vérifie le script CLI src.draft_publisher et l'export du rapport JSON."""
+    from src import draft_publisher
+
+    report_dir = tmp_path / "out_drafts"
+    mock_result = {
+        "status": "success",
+        "publications_before": 0,
+        "drafts_before": 22,
+        "publications_after": 22,
+        "drafts_after": 0,
+        "published_count": 22,
+        "failed_count": 0,
+    }
+
+    with patch("src.draft_publisher.TikTokStudioUploader") as mock_cls:
+        mock_cls.return_value.publish_all_drafts.return_value = mock_result
+        with patch("sys.argv", ["draft_publisher.py", "--max", "30", "--screenshots-dir", str(report_dir)]):
+            draft_publisher.main()
+
+    report_json = report_dir / "draft_publish_report.json"
+    assert report_json.exists()
+    saved = json.loads(report_json.read_text(encoding="utf-8"))
+    assert saved["published_count"] == 22
+    assert saved["status"] == "success"
 
 

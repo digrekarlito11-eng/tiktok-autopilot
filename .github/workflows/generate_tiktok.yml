@@ -34,11 +34,11 @@ on:
       publish_mode:
         description: "📱 Publication TikTok"
         required: false
-        default: "draft"
+        default: "public"
         type: choice
         options:
-          - "draft"
           - "public"
+          - "draft"
           - "none"
       progress_bar:
         description: "⏱️ Ajouter la barre de progression animée"
@@ -100,7 +100,7 @@ jobs:
           CLIPS_COUNT: ${{ github.event.inputs.clips_count }}
           THEME: ${{ github.event.inputs.theme }}
           WATERMARK: ${{ github.event.inputs.watermark }}
-          PUBLISH_MODE: ${{ github.event.inputs.publish_mode }}
+          PUBLISH_MODE: ${{ github.event.inputs.publish_mode || 'public' }}
           PROGRESS_BAR: ${{ github.event.inputs.progress_bar }}
           USE_WARP: "true"
           ABORT_IF_YOUTUBE_BLOCKED: "0"
