@@ -1,7 +1,7 @@
 # 🕊️ Rapport Autopilot 24/7 - Prédications & Brouillons TikTok
 **Dernière exécution :** 14/11/2026 à 20:32 GMT (Fuseau horaire GMT / Abidjan)
-**Statut :** `SUCCES`
-**Total prédications traitées :** 1
+**Statut :** `EN_ATTENTE_SESSION`
+**Total prédications traitées :** 0
 **Bibliothèque source :** [Accéder au dossier YouTube](https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ)
 
 ---
@@ -13,18 +13,18 @@
 - **Clips extraits (1 à 2 min) :** 3
 - **Destination :** Brouillons TikTok Studio 📱
 
-### 📋 Liste des 10 Shorts Générés avec Gospel Intelligence
+### 📋 Liste des 3 Shorts Générés avec Gospel Intelligence
 | # | Durée | Accroche (Hook) | Cible Rétention | Brouillon TikTok |
 |---|---|---|---|---|
-| Clip 1 | 119s | **LE MIRACLE QUE TU ATTENDS ARRIVE ⚡** | 92% | 📁 Fichier Prêt (En attente Session) |
-| Clip 2 | 119s | **LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡** | 92% | 📁 Fichier Prêt (En attente Session) |
-| Clip 3 | 117s | **ÉCOUTE CE MESSAGE PROPHÉTIQUE 🕊️** | 92% | 📁 Fichier Prêt (En attente Session) |
+| Clip 1 | 119s | **LE MIRACLE QUE TU ATTENDS ARRIVE ⚡** | 92% | 🔑 Session à renouveler (TIKTOK_SESSION_ID) |
+| Clip 2 | 119s | **LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡** | 92% | 🔑 Session à renouveler (TIKTOK_SESSION_ID) |
+| Clip 3 | 117s | **ÉCOUTE CE MESSAGE PROPHÉTIQUE 🕊️** | 92% | 🔑 Session à renouveler (TIKTOK_SESSION_ID) |
 
-### 💡 Prochaine Étape pour Karl
-1. Ouvre ton application TikTok sur ton téléphone.
-2. Rends-toi dans ton profil > **Brouillons**.
-3. Les vidéos y sont déjà pré-remplies avec l'accroche, les hashtags (#mariage, #foi, #chretien) et le texte.
-4. Clique sur 'Publier' au moment où tu le souhaites !
+### 🔑 Action requise pour déposer automatiquement dans tes Brouillons TikTok
+Les vidéos et fiches textes ont bien été générées et archivées dans GitHub Actions, mais TikTok a demandé une reconnexion.
+1. Connecte-toi à **TikTok Studio** dans Chrome/Edge, ouvre **Cookie-Editor** et clique sur **Export > Export as JSON**.
+2. Colle ce texte JSON dans le Secret GitHub `TIKTOK_SESSION_ID` (Paramètres > Secrets > Actions).
+3. Cette prédication n'est **pas marquée comme terminée** : le robot réessaiera automatiquement au prochain cycle !
 
 ---
 *Généré automatiquement par le CEO Multi-Agents (DevOps-Bot, Media-Bot, Growth-Bot & Gospel Intelligence)*

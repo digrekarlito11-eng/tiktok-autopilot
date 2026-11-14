@@ -102,3 +102,80 @@ def test_generate_markdown_report(tmp_path):
     assert "La Guérison de l'Âme - Ps Juliana Ondo" in content
     assert "DIEU A VU TES LARMES CACHÉES" in content
     assert "Brouillons TikTok Studio" in content
+
+
+def test_run_cycle_does_not_mark_processed_on_auth_error(tmp_path):
+    history_file = str(tmp_path / "history.json")
+    report_file = str(tmp_path / "REPORT.md")
+
+    bot = LibraryAutopilot(
+        history_path=history_file,
+        report_path=report_file,
+        publish_mode="draft",
+        clips_count=2,
+    )
+
+    mock_items = [
+        {"id": "vid_retry", "title": "Prédication Test", "duration": 1800, "url": "https://yt.com/vid_retry"}
+    ]
+    fake_pipeline_result = {
+        "clips": [
+            {"clip_number": 1, "duration": 90.0, "hook": "HOOK 1", "retention": "90%", "publication": {"status": "auth_error"}},
+            {"clip_number": 2, "duration": 95.0, "hook": "HOOK 2", "retention": "88%", "publication": {"status": "auth_error"}},
+        ]
+    }
+
+    with patch.object(bot, "fetch_playlist_items", return_value=mock_items):
+        with patch("src.library_autopilot.TikTokPipeline") as mock_pipe_cls:
+            mock_pipe_cls.return_value.process_url.return_value = fake_pipeline_result
+            res = bot.run_cycle()
+
+    assert res["status"] == "auth_error"
+    assert res["clips_generated"] == 2
+    assert res["clips_published"] == 0
+    assert bot.history_data["processed_video_ids"] == []
+    assert bot.history_data["total_processed"] == 0
+
+    with open(report_file, "r", encoding="utf-8") as f:
+        report = f.read()
+    assert "EN_ATTENTE_SESSION" in report
+    assert "Liste des 2 Shorts" in report
+    assert "Liste des 10 Shorts" not in report
+
+
+def test_run_cycle_marks_processed_on_success(tmp_path):
+    history_file = str(tmp_path / "history.json")
+    report_file = str(tmp_path / "REPORT.md")
+
+    bot = LibraryAutopilot(
+        history_path=history_file,
+        report_path=report_file,
+        publish_mode="draft",
+        clips_count=2,
+    )
+
+    mock_items = [
+        {"id": "vid_ok", "title": "Prédication Validée", "duration": 1800, "url": "https://yt.com/vid_ok"}
+    ]
+    fake_pipeline_result = {
+        "clips": [
+            {"clip_number": 1, "duration": 90.0, "hook": "HOOK 1", "retention": "90%", "publication": {"status": "success"}},
+            {"clip_number": 2, "duration": 95.0, "hook": "HOOK 2", "retention": "88%", "publication": {"status": "success"}},
+        ]
+    }
+
+    with patch.object(bot, "fetch_playlist_items", return_value=mock_items):
+        with patch("src.library_autopilot.TikTokPipeline") as mock_pipe_cls:
+            mock_pipe_cls.return_value.process_url.return_value = fake_pipeline_result
+            res = bot.run_cycle()
+
+    assert res["status"] == "success"
+    assert res["clips_published"] == 2
+    assert bot.history_data["processed_video_ids"] == ["vid_ok"]
+    assert bot.history_data["total_processed"] == 1
+
+    with open(report_file, "r", encoding="utf-8") as f:
+        report = f.read()
+    assert "SUCCES" in report
+    assert "Liste des 2 Shorts" in report
+

@@ -46,6 +46,11 @@ on:
         required: false
         default: false
         type: boolean
+      use_warp:
+        description: "🌐 Activer le tunnel Cloudflare WARP (laisser activé sauf test diagnostic)"
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: write
@@ -62,6 +67,7 @@ jobs:
           fetch-depth: 0
 
       - name: 🌐 Configuration Réseau Anti-Blocage (Cloudflare WARP)
+        if: ${{ github.event.inputs.use_warp != 'false' }}
         uses: fscarmen/warp-on-actions@v1.4
         continue-on-error: true
         with:
@@ -125,6 +131,7 @@ jobs:
             echo "ℹ️ Aucun nouvel enregistrement d'historique à pousser."
           else
             git commit -m "chore(autopilot): actualisation du registre des prédications traitées [skip ci]"
+            git pull --rebase origin main
             git push origin main
             echo "✅ Registre d'historique synchronisé sur GitHub."
           fi

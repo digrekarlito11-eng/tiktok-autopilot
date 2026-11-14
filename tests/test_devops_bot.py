@@ -347,7 +347,7 @@ def test_main_cli_missing_source_exits():
 
 
 def test_parse_and_prepare_cookies_various_formats():
-    """Vérifie la robustesse du parseur de cookies multi-formats et la détection d'URL."""
+    """Vérifie la robustesse du parseur de cookies multi-formats et la détection d'anomalies."""
     from src.tiktok_studio_uploader import TikTokStudioUploader
 
     # 1. Raw token
@@ -368,12 +368,219 @@ def test_parse_and_prepare_cookies_various_formats():
     names = [c["name"] for c in c3]
     assert "sessionid" in names and "sessionid_ss" in names and "sid_tt" in names
 
-    # 4. JSON
-    c4 = TikTokStudioUploader.parse_and_prepare_cookies('[{"name": "sessionid", "value": "json_val"}]')
-    assert len(c4) == 2
-    assert c4[0]["value"] == "json_val"
+    # 4. Cookie-Editor JSON with sameSite & expirationDate
+    c4_json = json.dumps([
+        {
+            "name": "sessionid",
+            "value": "json_val",
+            "domain": ".tiktok.com",
+            "path": "/",
+            "sameSite": "no_restriction",
+            "secure": False,
+            "httpOnly": True,
+            "expirationDate": 1800000000.5,
+        },
+        {
+            "name": "sid_guard",
+            "value": "guard_val",
+            "sameSite": "strict",
+            "httpOnly": False,
+        },
+    ])
+    c4 = TikTokStudioUploader.parse_and_prepare_cookies(c4_json)
+    c4_map = {c["name"]: c for c in c4}
+    assert {"sessionid", "sessionid_ss", "sid_guard"} <= set(c4_map.keys())
+    assert c4_map["sessionid"]["sameSite"] == "None"
+    assert c4_map["sessionid"]["secure"] is True  # forced for SameSite=None
+    assert c4_map["sessionid"]["expires"] == 1800000000
+    assert c4_map["sid_guard"]["sameSite"] == "Strict"
+    assert c4_map["sid_guard"]["httpOnly"] is False
 
-    # 5. Invalid URL
-    c5 = TikTokStudioUploader.parse_and_prepare_cookies("https://www.tiktok.com/tiktokstudio/upload")
-    assert c5 == []
+    # 5. Playwright storageState JSON
+    c5 = TikTokStudioUploader.parse_and_prepare_cookies(
+        json.dumps({"cookies": [{"name": "sessionid", "value": "ss_val"}], "origins": []})
+    )
+    assert any(c["name"] == "sessionid" and c["value"] == "ss_val" for c in c5)
+
+    # 6. Netscape cookies.txt (including #HttpOnly_)
+    netscape_txt = (
+        "# Netscape HTTP Cookie File\n"
+        "#HttpOnly_.tiktok.com\tTRUE\t/\tTRUE\t1800000000\tsessionid\tnetscape_sess\n"
+        ".tiktok.com\tTRUE\t/\tTRUE\t1800000000\tsid_tt\tnetscape_sid\n"
+    )
+    c6 = TikTokStudioUploader.parse_and_prepare_cookies(netscape_txt)
+    c6_map = {c["name"]: c for c in c6}
+    assert c6_map["sessionid"]["value"] == "netscape_sess"
+    assert c6_map["sessionid"]["httpOnly"] is True
+    assert c6_map["sid_tt"]["value"] == "netscape_sid"
+    assert "sessionid_ss" in c6_map
+
+    # 7. Chrome DevTools row paste
+    devtools_txt = "Name\tValue\tDomain\tPath\nsessionid\tdev_sess\t.tiktok.com\t/\nsid_guard\tdev_guard\t.tiktok.com\t/"
+    c7 = TikTokStudioUploader.parse_and_prepare_cookies(devtools_txt)
+    c7_map = {c["name"]: c for c in c7}
+    assert c7_map["sessionid"]["value"] == "dev_sess"
+    assert c7_map["sid_guard"]["value"] == "dev_guard"
+
+    # 8. Invalid URL, truncated JSON, and multi-line non-cookie text
+    assert TikTokStudioUploader.parse_and_prepare_cookies("https://www.tiktok.com/tiktokstudio/upload") == []
+    assert TikTokStudioUploader.parse_and_prepare_cookies('[{"name": "sessionid"') == []
+    assert TikTokStudioUploader.parse_and_prepare_cookies("hello world\nnot a cookie") == []
+
+
+def test_tiktok_studio_uploader_rejects_export_without_sessionid(tmp_path):
+    """Vérifie que l'uploader refuse proprement un export JSON sans cookie sessionid."""
+    from src.tiktok_studio_uploader import TikTokStudioUploader
+
+    video_file = tmp_path / "clip.mp4"
+    video_file.write_bytes(b"\x00" * 128)
+    no_sess_json = json.dumps([{"name": "ttwid", "value": "guest_only"}])
+
+    uploader = TikTokStudioUploader(session_id=no_sess_json, screenshots_dir=str(tmp_path / "screens"))
+    res = uploader.upload(str(video_file), "Légende test", mode="draft")
+
+    assert res["status"] == "auth_error"
+    assert "sessionid" in res["error"]
+
+
+def test_tiktok_studio_uploader_draft_save_flow_mock(tmp_path):
+    """Vérifie le flux complet TikTokStudioUploader (warm-up, upload, save_draft_button) avec Playwright simulé."""
+    import sys
+    import types
+    from src.tiktok_studio_uploader import TikTokStudioUploader
+
+    video_file = tmp_path / "clip.mp4"
+    video_file.write_bytes(b"MP4DATA")
+    screens_dir = tmp_path / "screens"
+
+    class FakeLocator:
+        def __init__(self, selector, page):
+            self.selector = selector
+            self.page = page
+
+        def count(self):
+            if self.selector in ("input[type='file']", ".public-DraftEditor-content", "button[data-e2e='save_draft_button']"):
+                return 1
+            return 0
+
+        @property
+        def first(self):
+            return self
+
+        def wait_for(self, **kwargs):
+            return None
+
+        def is_visible(self):
+            if self.selector == "button[data-e2e='save_draft_button']" and self.page.draft_saved:
+                return False
+            return self.count() > 0
+
+        def set_input_files(self, path):
+            self.page.uploaded_path = path
+
+        def scroll_into_view_if_needed(self):
+            return None
+
+        def get_attribute(self, attr):
+            return None
+
+        def click(self, **kwargs):
+            if self.selector == "button[data-e2e='save_draft_button']":
+                self.page.draft_saved = True
+                self.page.url = "https://www.tiktok.com/tiktokstudio/content"
+
+    class FakePage:
+        def __init__(self):
+            self.url = "about:blank"
+            self.frames = []
+            self.draft_saved = False
+            self.uploaded_path = None
+            self.visited_urls = []
+            self.keyboard = MagicMock()
+
+        def set_default_timeout(self, ms):
+            pass
+
+        def on(self, event, cb):
+            pass
+
+        def goto(self, url, **kwargs):
+            self.visited_urls.append(url)
+            self.url = url
+
+        def title(self):
+            return "TikTok Studio"
+
+        def locator(self, sel):
+            return FakeLocator(sel, self)
+
+        def inner_text(self, sel):
+            if self.draft_saved:
+                return "Enregistré dans les brouillons"
+            return "100% Téléchargé"
+
+        def evaluate(self, script):
+            return None
+
+        def screenshot(self, path, **kwargs):
+            Path(path).write_bytes(b"PNG")
+
+    fake_page = FakePage()
+    fake_context = MagicMock()
+    fake_context.new_page.return_value = fake_page
+    fake_browser = MagicMock()
+    fake_browser.version = "131.0.6778.85"
+    fake_browser.new_context.return_value = fake_context
+    fake_p = MagicMock()
+    fake_p.chromium.launch.return_value = fake_browser
+
+    fake_cm = MagicMock()
+    fake_cm.__enter__.return_value = fake_p
+    fake_cm.__exit__.return_value = False
+
+    fake_sync_mod = types.ModuleType("playwright.sync_api")
+    fake_sync_mod.sync_playwright = lambda: fake_cm
+    fake_pw_mod = types.ModuleType("playwright")
+    fake_pw_mod.sync_api = fake_sync_mod
+
+    cookies_json = json.dumps([
+        {"name": "sessionid", "value": "valid_sess"},
+        {"name": "sid_tt", "value": "valid_sid"},
+    ])
+
+    with patch.dict(sys.modules, {"playwright": fake_pw_mod, "playwright.sync_api": fake_sync_mod}):
+        with patch("time.sleep", return_value=None):
+            uploader = TikTokStudioUploader(session_id=cookies_json, screenshots_dir=str(screens_dir))
+            res = uploader.upload(str(video_file), "Parole bénie #chretien", mode="draft")
+
+    assert res["status"] == "success"
+    assert res["action_clicked"] is True
+    assert res["success_detected"] is True
+    assert fake_page.uploaded_path == str(video_file.resolve())
+    assert fake_page.visited_urls == [
+        "https://www.tiktok.com/?lang=fr",
+        "https://www.tiktok.com/tiktokstudio/upload?lang=fr",
+    ]
+    assert (screens_dir / "04_action_clicked.png").exists()
+    assert (screens_dir / "05_final_state.png").exists()
+
+
+def test_workflow_autopilot_247_yaml_validity():
+    """Vérifie la validité YAML et les sécurités de .github/workflows/autopilot_247.yml."""
+    import yaml
+
+    yaml_path = Path(__file__).resolve().parent.parent / ".github" / "workflows" / "autopilot_247.yml"
+    assert yaml_path.exists()
+    with open(yaml_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+
+    on_key = True if True in data else "on"
+    inputs = data[on_key]["workflow_dispatch"]["inputs"]
+    assert "use_warp" in inputs
+    assert inputs["use_warp"]["default"] is True
+
+    steps = data["jobs"]["autopilot-cycle"]["steps"]
+    history_step = next(s for s in steps if "Historique" in s.get("name", ""))
+    assert "git pull --rebase origin main" in history_step["run"]
+
 
