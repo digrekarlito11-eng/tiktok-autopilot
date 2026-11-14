@@ -1,7 +1,7 @@
 {
   "playlist_url": "https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ",
   "playlist_title": "Shorts à Générer",
-  "last_updated": "2026-11-14T22:15:51.508986+00:00",
+  "last_updated": "2026-11-14T22:54:11.341495+00:00",
   "total_processed": 2,
   "processed_video_ids": [
     "g2cfTnE_Hpw",
@@ -183,6 +183,89 @@
         {
           "clip_number": 10,
           "duration": 109.2,
+          "hook": "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡",
+          "retention": "92%",
+          "publication_status": "success"
+        }
+      ]
+    },
+    {
+      "id": "g2cfTnE_Hpw",
+      "title": "Le mariage   Comment faire le bon choix Partie 1",
+      "url": "https://www.youtube.com/watch?v=g2cfTnE_Hpw",
+      "processed_at": "2026-11-14T22:54:11.341448+00:00",
+      "delivery_status": "SUCCES_PARTIEL (9/10)",
+      "clips_count": 10,
+      "clips_published": 9,
+      "theme": "gospel",
+      "watermark": "@parole.de.foi",
+      "clips_summary": [
+        {
+          "clip_number": 1,
+          "duration": 119.52,
+          "hook": "LE MIRACLE QUE TU ATTENDS ARRIVE ⚡",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 2,
+          "duration": 119.12,
+          "hook": "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 3,
+          "duration": 117.56,
+          "hook": "ÉCOUTE CE MESSAGE PROPHÉTIQUE 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 4,
+          "duration": 118.68,
+          "hook": "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 5,
+          "duration": 119.6,
+          "hook": "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 6,
+          "duration": 119.44,
+          "hook": "CE CYCLE DE SOUFFRANCE DANS TA FAMILLE S'ARRÊTE AUJOURD'HUI 🔥",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 7,
+          "duration": 119.08,
+          "hook": "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 8,
+          "duration": 119.27,
+          "hook": "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡",
+          "retention": "92%",
+          "publication_status": "completed_with_screenshots"
+        },
+        {
+          "clip_number": 9,
+          "duration": 118.6,
+          "hook": "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 10,
+          "duration": 119.56,
           "hook": "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡",
           "retention": "92%",
           "publication_status": "success"
