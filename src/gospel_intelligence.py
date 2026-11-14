@@ -50,7 +50,7 @@ GOSPEL_ARCHETYPES = {
             "je décrète", "je decrete", "je déclare", "je declare", "saison", "témoignage"
         ],
         "default_hook": "CE CYCLE DE SOUFFRANCE DANS TA FAMILLE S'ARRÊTE AUJOURD'HUI 🔥",
-        "cta": "Écris 'AMEN' avec foi pour sceller cette délivrance dans ta famille 👇"
+        "cta": "Écris 'AMEN' en commentaire pour sceller cette bénédiction 👇"
     },
     "GUERISON_INTERIEURE": {
         "preachers": ["Juliana Ondo"],

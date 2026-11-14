@@ -76,7 +76,7 @@ def main():
     parser.add_argument("--url", type=str, help="Lien de la vidéo source (YouTube, prédication, émission...)")
     parser.add_argument("--video", type=str, help="Chemin d'une vidéo locale MP4")
     parser.add_argument("--batch", type=str, help="Fichier texte contenant plusieurs liens (1 par ligne)")
-    parser.add_argument("--clips", type=int, default=10, help="Nombre de clips TikTok à extraire par vidéo (défaut: 10)")
+    parser.add_argument("--clips", type=int, default=1, help="Nombre de clips TikTok à extraire par vidéo (défaut: 1)")
     parser.add_argument("--output", type=str, default="output", help="Dossier de sortie des vidéos TikTok")
     parser.add_argument("--theme", type=str, default="gospel", choices=["gospel", "gold", "neon", "minimal"], help="Thème visuel (gospel, gold, neon, minimal)")
     parser.add_argument("--watermark", type=str, default="@parole.de.foi", help="Badge / Watermark dans la Safe Zone")

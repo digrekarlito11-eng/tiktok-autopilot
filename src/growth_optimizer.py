@@ -20,8 +20,10 @@ class GrowthOptimizer:
         text = clip_info.get("text", "")
         first_sentence = clip_info.get("first_sentence", "")
 
-        # 1. Détermination du Hook pour le bandeau supérieur de la vidéo (Gospel Intelligence)
-        hook_banner = clip_info.get("recommended_hook") or self._generate_hook_banner(first_sentence, text)
+        # 1. Détermination du Hook pour le bandeau supérieur de la vidéo
+        hook_banner = self._generate_hook_banner(first_sentence, text)
+        if hook_banner == "DIEU A UN MESSAGE POUR TOI AUJOURD'HUI ✝️" and clip_info.get("recommended_hook"):
+            hook_banner = clip_info.get("recommended_hook")
 
         # 2. Appel à l'action pour maximiser les commentaires (Comment Magnet)
         cta = clip_info.get("recommended_cta") or "Écris 'AMEN' en commentaire pour sceller cette bénédiction 👇"
@@ -32,9 +34,9 @@ class GrowthOptimizer:
         # 4. Sélection des hashtags performants (Chrétien, Foi, Prédicateurs, Côte d'Ivoire, Viral)
         hashtags = self._select_hashtags(text, video_title)
 
-        # 5. Score de rétention prévisionnel (optimisé pour vidéos de 1 à 2 min)
+        # 5. Score de rétention prévisionnel (optimisé pour vidéos TikTok)
         base_score = clip_info.get("score", 10)
-        estimated_retention = min(95, int(72 + (base_score % 22)))
+        estimated_retention = min(92, int(70 + base_score * 1.4))
 
         # 6. Créneaux de publication recommandés pour la Côte d'Ivoire (Fuseau horaire GMT / Abidjan)
         posting_slots = [
@@ -69,6 +71,14 @@ class GrowthOptimizer:
             return "LE MIRACLE QUE TU ATTENDS ARRIVE ⚡"
         elif any(w in text_lower for w in ["combat", "ennemi", "délivrance", "victoire"]):
             return "TA VICTOIRE EST PROCHE DÉCLARE-LE ⚔️"
+        elif any(w in text_lower for w in ["mariage", "foyer", "femme", "mari", "conjoint", "célibat", "celibat"]):
+            return "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡"
+        elif any(w in text_lower for w in ["blessure", "blessures", "coeur", "cœur", "guérison", "guerison"]):
+            return "DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️"
+        elif any(w in text_lower for w in ["blocage", "malédiction", "malediction", "autel"]):
+            return "CE CYCLE DE SOUFFRANCE DANS TA FAMILLE S'ARRÊTE AUJOURD'HUI 🔥"
+        elif any(w in text_lower for w in ["destinée", "destinee", "mindset", "pensée", "mentalité"]):
+            return "TU N'ES PAS NÉ POUR ACCOMPAGNER LES AUTRES 🕊️"
         elif any(w in text_lower for w in ["prière", "prier", "demande"]):
             return "FAIS CETTE PRIÈRE PUISSANTE 🙏"
         elif any(w in text_lower for w in ["épreuve", "douleur", "pleurer", "difficile"]):
@@ -101,8 +111,16 @@ class GrowthOptimizer:
 
         combined = (text + " " + video_title).lower()
 
+        # Tags spécifiques aux thématiques clés
+        if "prophétie" in combined or "prophetie" in combined:
+            theme_tags.insert(0, "#prophetie")
+        if "miracle" in combined:
+            theme_tags.insert(0, "#miracle")
+        if "combat" in combined:
+            theme_tags.insert(0, "#combatspirituel")
+
         # Tags spécifiques aux prédicateurs et thématiques clés
-        if any(w in combined for w in ["mariage", "foyer", "femme", "mari", "conjoint", "célibat"]):
+        if any(w in combined for w in ["mariage", "foyer", "femme", "mari", "conjoint", "célibat", "celibat"]):
             theme_tags.append("#mariagechretien")
             theme_tags.append("#marcelotunasi")
         if any(w in combined for w in ["destinée", "destinee", "pensée", "mentalité"]):
@@ -118,7 +136,7 @@ class GrowthOptimizer:
             theme_tags.append("#yannickdjatti")
             theme_tags.append("#reveil")
 
-        all_tags = base_tags + local_tags + theme_tags[:5]
+        all_tags = base_tags + local_tags + theme_tags
         # Dé-doublonnage tout en gardant l'ordre
         seen = set()
         deduped = []
@@ -126,7 +144,7 @@ class GrowthOptimizer:
             if tag not in seen:
                 seen.add(tag)
                 deduped.append(tag)
-        return deduped
+        return deduped[:10]
 
     def export_summary_sheet(self, package: Dict[str, Any], output_path: str):
         """Crée une fiche mémo complète pour Karl."""
