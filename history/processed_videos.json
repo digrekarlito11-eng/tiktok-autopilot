@@ -1,9 +1,11 @@
 {
   "playlist_url": "https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ",
   "playlist_title": "Shorts à Générer",
-  "last_updated": "2026-11-14T20:01:19.316862+00:00",
+  "last_updated": "2026-11-14T20:32:24.515328+00:00",
   "total_processed": 1,
-  "processed_video_ids": [],
+  "processed_video_ids": [
+    "g2cfTnE_Hpw"
+  ],
   "history": [
     {
       "id": "g2cfTnE_Hpw",
@@ -31,6 +33,38 @@
         {
           "clip_number": 3,
           "duration": 118.16,
+          "hook": "ÉCOUTE CE MESSAGE PROPHÉTIQUE 🕊️",
+          "retention": "92%",
+          "publication_status": "auth_error"
+        }
+      ]
+    },
+    {
+      "id": "g2cfTnE_Hpw",
+      "title": "Le mariage   Comment faire le bon choix Partie 1",
+      "url": "https://www.youtube.com/watch?v=g2cfTnE_Hpw",
+      "processed_at": "2026-11-14T20:32:24.515289+00:00",
+      "clips_count": 3,
+      "theme": "gospel",
+      "watermark": "@parole.de.foi",
+      "clips_summary": [
+        {
+          "clip_number": 1,
+          "duration": 119.52,
+          "hook": "LE MIRACLE QUE TU ATTENDS ARRIVE ⚡",
+          "retention": "92%",
+          "publication_status": "auth_error"
+        },
+        {
+          "clip_number": 2,
+          "duration": 119.12,
+          "hook": "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡",
+          "retention": "92%",
+          "publication_status": "auth_error"
+        },
+        {
+          "clip_number": 3,
+          "duration": 117.56,
           "hook": "ÉCOUTE CE MESSAGE PROPHÉTIQUE 🕊️",
           "retention": "92%",
           "publication_status": "auth_error"
