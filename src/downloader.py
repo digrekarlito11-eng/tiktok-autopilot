@@ -104,7 +104,24 @@ class VideoDownloader:
         if cookies_file and os.path.exists(cookies_file):
             dl_cmd.extend(["--cookies", cookies_file])
 
-        subprocess.run(dl_cmd, check=True)
+        try:
+            subprocess.run(dl_cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"⚠️ Note sous-titres YouTube ({e}) : téléchargement direct du flux vidéo seul pour transcription locale...")
+            fallback_cmd = [
+                sys.executable, "-m", "yt_dlp",
+                "--js-runtimes", "node",
+                "--remote-components", "ejs:github",
+                "--extractor-args", "youtube:player_client=tv,web_embedded;player_skip=webpage",
+                "--format", "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best",
+                "--no-playlist",
+                "--merge-output-format", "mp4",
+                "--output", output_template,
+                url
+            ]
+            if cookies_file and os.path.exists(cookies_file):
+                fallback_cmd.extend(["--cookies", cookies_file])
+            subprocess.run(fallback_cmd, check=True)
 
     def download(self, url: str) -> Dict[str, Any]:
         """
