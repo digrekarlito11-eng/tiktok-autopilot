@@ -1,6 +1,6 @@
 # 🕊️ Rapport Autopilot 24/7 - Prédications & Brouillons TikTok
-**Dernière exécution :** 14/11/2026 à 21:27 GMT (Fuseau horaire GMT / Abidjan)
-**Statut :** `ERREUR : Command '['/opt/hostedtoolcache/Python/3.11.18/x64/bin/python', '-m', 'yt_dlp', '--force-ipv4', '--extractor-args', 'youtube:player_client=android_vr', '--format', 'bestvideo[height<=1080]+bestaudio/best[height<=1080]/best', '--no-playlist', '--merge-output-format', 'mp4', '--output', 'downloads/session_source_9fdb01fd/source_%(title).40s.%(ext)s', 'https://www.youtube.com/watch?v=g2cfTnE_Hpw']' returned non-zero exit status 1.`
+**Dernière exécution :** 14/11/2026 à 21:30 GMT (Fuseau horaire GMT / Abidjan)
+**Statut :** `ERREUR : Command '['/opt/hostedtoolcache/Python/3.11.18/x64/bin/python', '-m', 'yt_dlp', '--force-ipv4', '--extractor-args', 'youtube:player_client=android_vr', '--format', 'bestvideo[height<=1080]+bestaudio/best[height<=1080]/best', '--no-playlist', '--merge-output-format', 'mp4', '--output', 'downloads/session_source_287b5066/source_%(title).40s.%(ext)s', 'https://www.youtube.com/watch?v=g2cfTnE_Hpw']' returned non-zero exit status 1.`
 **Total prédications traitées :** 0
 **Bibliothèque source :** [Accéder au dossier YouTube](https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ)
 
