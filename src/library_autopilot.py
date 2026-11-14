@@ -86,6 +86,7 @@ class LibraryAutopilot:
         """
         print(f"📡 [Autopilot 24/7] Analyse de la bibliothèque YouTube : {self.playlist_url}")
         cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE")
+        yt_proxy = (os.environ.get("YT_DLP_PROXY") or os.environ.get("YOUTUBE_PROXY") or "").strip()
         flag_sets = [
             ["--force-ipv4"],
             [
@@ -104,6 +105,8 @@ class LibraryAutopilot:
                 "--dump-json",
                 self.playlist_url
             ]
+            if yt_proxy:
+                cmd.extend(["--proxy", yt_proxy])
             if cookies_file and os.path.exists(cookies_file):
                 cmd.extend(["--cookies", cookies_file])
 

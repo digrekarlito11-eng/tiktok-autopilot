@@ -112,6 +112,8 @@ jobs:
           THEME: ${{ github.event.inputs.theme || 'gospel' }}
           PUBLISH_MODE: ${{ github.event.inputs.publish_mode || 'draft' }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          USE_WARP: ${{ github.event.inputs.use_warp || 'true' }}
+          ABORT_IF_YOUTUBE_BLOCKED: "1"
         run: |
           cmd=(python -m src.library_autopilot --theme "$THEME" --clips "$CLIPS_COUNT" --publish "$PUBLISH_MODE")
           if [ -n "$FORCE_VIDEO_ID" ]; then
@@ -120,7 +122,97 @@ jobs:
           if [ "$DRY_RUN" = "true" ]; then
             cmd+=(--dry-run)
           fi
-          "${cmd[@]}"
+          bash .github/scripts/run_with_youtube_proxy.sh "${cmd[@]}"
+
+      - name: 💾 Mémorisation & Sauvegarde de l'Historique dans GitHub
+        if: always()
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "Karl-Autopilot-CEO[bot]"
+          git add history/
+          if git diff --staged --quiet; then
+            echo "ℹ️ Aucun nouvel enregistrement d'historique à pousser."
+          else
+            git commit -m "chore(autopilot): actualisation du registre des prédications traitées [skip ci]"
+            git pull --rebase origin main
+            git push origin main
+            echo "✅ Registre d'historique synchronisé sur GitHub."
+          fi
+
+      - name: 📦 Archivage des 10 Shorts, Fiches & Captures TikTok Studio
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tiktok-brouillons-autopilot
+          path: output/
+          retention-days: 14
+
+  autopilot-cycle-arm:
+    name: 🛡️ Bascule Régionale Autonome (Runner ARM64)
+    needs: autopilot-cycle
+    if: ${{ failure() && !cancelled() && github.event.inputs.dry_run != 'true' }}
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+      - name: 📥 Récupération du dépôt & historique
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🌐 Configuration Réseau Anti-Blocage (Cloudflare WARP)
+        if: ${{ github.event.inputs.use_warp != 'false' }}
+        uses: fscarmen/warp-on-actions@v1.4
+        continue-on-error: true
+        with:
+          stack: dual
+          mode: wireguard
+
+      - name: 🍪 Configuration Cookies YouTube (Optionnel)
+        env:
+          YOUTUBE_COOKIES_TEXT: ${{ secrets.YOUTUBE_COOKIES_TEXT }}
+        run: |
+          if [ -n "$YOUTUBE_COOKIES_TEXT" ]; then
+            echo "$YOUTUBE_COOKIES_TEXT" > /tmp/youtube_cookies.txt
+            echo "YOUTUBE_COOKIES_FILE=/tmp/youtube_cookies.txt" >> $GITHUB_ENV
+            echo "🍪 Cookies YouTube injectés avec succès."
+          fi
+
+      - name: ⚙️ Configuration de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: 🎞️ Installation de FFmpeg & Polices Typographiques
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libass-dev fonts-dejavu-core
+
+      - name: 📦 Installation des dépendances Python & Playwright
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install --upgrade yt-dlp
+          playwright install --with-deps chromium
+
+      - name: 🚀 Exécution de l'Autopilot 24/7 (Bascule ARM64)
+        env:
+          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+          TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
+          TIKTOK_WEBHOOK_URL: ${{ secrets.TIKTOK_WEBHOOK_URL }}
+          FORCE_VIDEO_ID: ${{ github.event.inputs.force_video_id }}
+          CLIPS_COUNT: ${{ github.event.inputs.clips_count || '10' }}
+          THEME: ${{ github.event.inputs.theme || 'gospel' }}
+          PUBLISH_MODE: ${{ github.event.inputs.publish_mode || 'draft' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          USE_WARP: ${{ github.event.inputs.use_warp || 'true' }}
+          ABORT_IF_YOUTUBE_BLOCKED: "0"
+        run: |
+          cmd=(python -m src.library_autopilot --theme "$THEME" --clips "$CLIPS_COUNT" --publish "$PUBLISH_MODE")
+          if [ -n "$FORCE_VIDEO_ID" ]; then
+            cmd+=(--force-id "$FORCE_VIDEO_ID")
+          fi
+          bash .github/scripts/run_with_youtube_proxy.sh "${cmd[@]}"
 
       - name: 💾 Mémorisation & Sauvegarde de l'Historique dans GitHub
         if: always()

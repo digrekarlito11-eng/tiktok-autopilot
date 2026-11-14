@@ -96,11 +96,14 @@ jobs:
           TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
           TIKTOK_WEBHOOK_URL: ${{ secrets.TIKTOK_WEBHOOK_URL }}
           VIDEO_URL: ${{ github.event.inputs.video_url }}
+          PROBE_VIDEO_URL: ${{ github.event.inputs.video_url }}
           CLIPS_COUNT: ${{ github.event.inputs.clips_count }}
           THEME: ${{ github.event.inputs.theme }}
           WATERMARK: ${{ github.event.inputs.watermark }}
           PUBLISH_MODE: ${{ github.event.inputs.publish_mode }}
           PROGRESS_BAR: ${{ github.event.inputs.progress_bar }}
+          USE_WARP: "true"
+          ABORT_IF_YOUTUBE_BLOCKED: "0"
         run: |
           cmd=(python main.py --url "$VIDEO_URL" --clips "$CLIPS_COUNT" --theme "$THEME" --watermark "$WATERMARK" --publish "$PUBLISH_MODE" --output output)
           if [ "$PROGRESS_BAR" != "true" ]; then
@@ -109,7 +112,7 @@ jobs:
           if [ -n "$TIKTOK_WEBHOOK_URL" ]; then
             cmd+=(--webhook "$TIKTOK_WEBHOOK_URL")
           fi
-          "${cmd[@]}"
+          bash .github/scripts/run_with_youtube_proxy.sh "${cmd[@]}"
 
       - name: 📦 Archivage des Vidéos, Fiches & Captures TikTok Studio
         uses: actions/upload-artifact@v4

@@ -31,12 +31,19 @@ class VideoDownloader:
             ],
         ),
         (
-            "ipv4+android_sdkless,mweb",
+            "ipv4+tv_simply,web_safari",
             [
                 "--force-ipv4",
                 "--js-runtimes", "node",
                 "--remote-components", "ejs:github",
-                "--extractor-args", "youtube:player_client=android_sdkless,mweb",
+                "--extractor-args", "youtube:player_client=tv_simply,web_safari",
+            ],
+        ),
+        (
+            "ipv4+visionos",
+            [
+                "--force-ipv4",
+                "--extractor-args", "youtube:player_client=visionos",
             ],
         ),
         (
@@ -56,6 +63,11 @@ class VideoDownloader:
     def _is_youtube_url(url: str) -> bool:
         lower = url.lower()
         return "youtube.com" in lower or "youtu.be" in lower
+
+    @staticmethod
+    def _get_youtube_proxy() -> Optional[str]:
+        proxy = (os.environ.get("YT_DLP_PROXY") or os.environ.get("YOUTUBE_PROXY") or "").strip()
+        return proxy or None
 
     @staticmethod
     def _cleanup_partial_downloads(output_template: str) -> None:
@@ -78,6 +90,7 @@ class VideoDownloader:
         if "playlist?list=" in clean_url or "&list=" in clean_url:
             print(f"📋 [Media-Bot] Bibliothèque / Playlist détectée : {clean_url}")
             cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE")
+            yt_proxy = self._get_youtube_proxy()
             playlist_flags_list = [
                 [],
                 ["--force-ipv4"],
@@ -92,6 +105,8 @@ class VideoDownloader:
                         "--dump-json",
                         clean_url
                     ]
+                    if yt_proxy:
+                        cmd.extend(["--proxy", yt_proxy])
                     if cookies_file and os.path.exists(cookies_file):
                         cmd.extend(["--cookies", cookies_file])
                     res = subprocess.run(cmd, capture_output=True, text=True, check=True)
@@ -115,7 +130,9 @@ class VideoDownloader:
         """
         url = self.resolve_video_url(url)
         cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE")
-        strategies = self.YOUTUBE_STRATEGIES if self._is_youtube_url(url) else [self.YOUTUBE_STRATEGIES[0]]
+        is_yt = self._is_youtube_url(url)
+        yt_proxy = self._get_youtube_proxy() if is_yt else None
+        strategies = self.YOUTUBE_STRATEGIES if is_yt else [self.YOUTUBE_STRATEGIES[0]]
 
         last_error: Optional[Exception] = None
         for strategy_name, extra_args in strategies:
@@ -126,6 +143,8 @@ class VideoDownloader:
                 "--no-playlist",
                 url
             ]
+            if yt_proxy:
+                info_cmd.extend(["--proxy", yt_proxy])
             if cookies_file and os.path.exists(cookies_file):
                 info_cmd.extend(["--cookies", cookies_file])
 
@@ -153,7 +172,9 @@ class VideoDownloader:
         """
         url = str(url).strip().strip("'\"").strip()
         cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE")
-        strategies = self.YOUTUBE_STRATEGIES if self._is_youtube_url(url) else [self.YOUTUBE_STRATEGIES[0]]
+        is_yt = self._is_youtube_url(url)
+        yt_proxy = self._get_youtube_proxy() if is_yt else None
+        strategies = self.YOUTUBE_STRATEGIES if is_yt else [self.YOUTUBE_STRATEGIES[0]]
         last_error: Optional[subprocess.CalledProcessError] = None
 
         # Passe 1 : Vidéo + sous-titres natifs français (gain de temps majeur vs Whisper)
@@ -172,6 +193,8 @@ class VideoDownloader:
                 "--output", output_template,
                 url
             ]
+            if yt_proxy:
+                dl_cmd.extend(["--proxy", yt_proxy])
             if cookies_file and os.path.exists(cookies_file):
                 dl_cmd.extend(["--cookies", cookies_file])
 
@@ -195,6 +218,8 @@ class VideoDownloader:
                 "--output", output_template,
                 url
             ]
+            if yt_proxy:
+                fallback_cmd.extend(["--proxy", yt_proxy])
             if cookies_file and os.path.exists(cookies_file):
                 fallback_cmd.extend(["--cookies", cookies_file])
 

@@ -223,3 +223,31 @@ def test_fetch_playlist_items_fallback_flags(tmp_path, monkeypatch):
     assert "--force-ipv4" in attempts[0]
     assert len(items) == 1
     assert items[0]["id"] == "vid_ok"
+
+
+def test_fetch_playlist_items_forwards_proxy(tmp_path, monkeypatch):
+    import subprocess
+    history_file = str(tmp_path / "history.json")
+    report_file = str(tmp_path / "REPORT.md")
+    bot = LibraryAutopilot(history_path=history_file, report_path=report_file)
+
+    captured = []
+
+    def mock_run(cmd, capture_output=True, text=True, check=True):
+        captured.append(list(cmd))
+        res = MagicMock()
+        res.stdout = json.dumps({"id": "vid_p", "title": "Prédication", "duration": 600}) + "\n"
+        return res
+
+    monkeypatch.setattr(subprocess, "run", mock_run)
+
+    monkeypatch.delenv("YT_DLP_PROXY", raising=False)
+    monkeypatch.delenv("YOUTUBE_PROXY", raising=False)
+    bot.fetch_playlist_items()
+    assert "--proxy" not in captured[0]
+
+    monkeypatch.setenv("YT_DLP_PROXY", "socks5h://127.0.0.1:18080")
+    bot.fetch_playlist_items()
+    assert "--proxy" in captured[1]
+    assert captured[1][captured[1].index("--proxy") + 1] == "socks5h://127.0.0.1:18080"
+

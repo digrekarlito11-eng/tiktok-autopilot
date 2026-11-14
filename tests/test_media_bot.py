@@ -167,6 +167,75 @@ class TestVideoDownloader:
         assert info["id"] == "res_123"
         assert info["title"] == "Sermon Résilient"
 
+    def test_youtube_strategies_exclude_unsupported_clients(self):
+        """Ensures removed/unsupported yt-dlp clients such as android_sdkless are absent."""
+        all_flags = " ".join(
+            flag for _, flags in VideoDownloader.YOUTUBE_STRATEGIES for flag in flags
+        )
+        assert "android_sdkless" not in all_flags
+        assert "tv,web_embedded" in all_flags
+        assert "tv_simply,web_safari" in all_flags
+        assert "visionos" in all_flags
+        assert "android_vr" in all_flags
+
+    def test_proxy_forwarded_for_youtube_urls_only(self, monkeypatch, tmp_path):
+        """Verifies YT_DLP_PROXY is passed to yt-dlp for YouTube URLs across resolve/info/download and omitted otherwise."""
+        downloader = VideoDownloader(download_dir=str(tmp_path))
+        monkeypatch.setenv("YT_DLP_PROXY", "socks5h://127.0.0.1:18080")
+
+        recorded_cmds = []
+
+        def mock_run(cmd, capture_output=False, text=False, check=True):
+            recorded_cmds.append(list(cmd))
+            mock_res = MagicMock()
+            if "--flat-playlist" in cmd:
+                mock_res.stdout = json.dumps({"id": "vid_proxy", "title": "Prédication"}) + "\n"
+            else:
+                mock_res.stdout = json.dumps({"id": "vid_proxy", "title": "Prédication", "duration": 60})
+            return mock_res
+
+        monkeypatch.setattr(subprocess, "run", mock_run)
+
+        resolved = downloader.resolve_video_url("https://youtube.com/playlist?list=PLTEST")
+        assert resolved == "https://www.youtube.com/watch?v=vid_proxy"
+        assert "--proxy" in recorded_cmds[0]
+        assert recorded_cmds[0][recorded_cmds[0].index("--proxy") + 1] == "socks5h://127.0.0.1:18080"
+
+        downloader.get_video_info("https://youtu.be/vid_proxy")
+        assert "--proxy" in recorded_cmds[1]
+        assert recorded_cmds[1][recorded_cmds[1].index("--proxy") + 1] == "socks5h://127.0.0.1:18080"
+
+        downloader._download_video("https://www.youtube.com/watch?v=vid_proxy", str(tmp_path / "out.%(ext)s"))
+        assert "--proxy" in recorded_cmds[2]
+
+        # Non-YouTube URLs should not receive YT_DLP_PROXY
+        downloader.get_video_info("https://vimeo.com/123456")
+        assert "--proxy" not in recorded_cmds[3]
+        downloader._download_video("https://vimeo.com/123456", str(tmp_path / "other.%(ext)s"))
+        assert "--proxy" not in recorded_cmds[4]
+
+    def test_download_video_pass2_forwards_proxy(self, monkeypatch, tmp_path):
+        """Verifies Pass 2 (video-only fallback) also forwards YT_DLP_PROXY on YouTube URLs."""
+        downloader = VideoDownloader(download_dir=str(tmp_path))
+        monkeypatch.setenv("YT_DLP_PROXY", "socks5h://127.0.0.1:18080")
+        pass_cmds = []
+
+        def mock_run(cmd, check=True):
+            pass_cmds.append(list(cmd))
+            # Fail all Pass 1 subtitle attempts, succeed on first Pass 2 attempt
+            if len(pass_cmds) <= len(VideoDownloader.YOUTUBE_STRATEGIES):
+                raise subprocess.CalledProcessError(1, cmd)
+            return MagicMock()
+
+        monkeypatch.setattr(subprocess, "run", mock_run)
+        downloader._download_video("https://www.youtube.com/watch?v=pass2", str(tmp_path / "p2.%(ext)s"))
+
+        assert len(pass_cmds) == len(VideoDownloader.YOUTUBE_STRATEGIES) + 1
+        pass2_cmd = pass_cmds[-1]
+        assert "--write-auto-subs" not in pass2_cmd
+        assert "--proxy" in pass2_cmd
+        assert pass2_cmd[pass2_cmd.index("--proxy") + 1] == "socks5h://127.0.0.1:18080"
+
 
 # ============================================================================
 # TIER 1: FEATURE COVERAGE — VideoTranscriber & VTT Parsing
