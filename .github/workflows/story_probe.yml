@@ -1,0 +1,45 @@
+name: 🔎 Sonde Story TikTok Studio (lecture seule)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  story-probe:
+    name: 🔎 Recherche de l'option Story sur TikTok Studio Web
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Récupération du dépôt
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Configuration de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: 📦 Installation de Playwright, Chromium & FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          pip install --upgrade pip
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: 🎞️ Vidéo de test (jamais publiée)
+        run: |
+          mkdir -p output/story_probe
+          ffmpeg -y -f lavfi -i "color=c=black:s=1080x1920:d=8" -f lavfi -i "anullsrc=r=44100:cl=stereo" -shortest -c:v libx264 -pix_fmt yuv420p -c:a aac /tmp/story_probe_test.mp4
+
+      - name: 🔎 Exécution de la sonde (aucun clic sur Publier)
+        env:
+          TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
+        run: python -u -m src.story_probe --video /tmp/story_probe_test.mp4 --out output/story_probe
+
+      - name: 📸 Archivage des captures
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tiktok-story-probe
+          path: output/story_probe/
+          retention-days: 7
