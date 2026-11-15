@@ -69,6 +69,7 @@ jobs:
       - name: 🌐 Configuration Réseau Anti-Blocage (Cloudflare WARP)
         if: ${{ github.event.inputs.use_warp != 'false' }}
         uses: fscarmen/warp-on-actions@v1.4
+        timeout-minutes: 2
         continue-on-error: true
         with:
           stack: dual
@@ -115,7 +116,7 @@ jobs:
           USE_WARP: ${{ github.event.inputs.use_warp || 'true' }}
           ABORT_IF_YOUTUBE_BLOCKED: "1"
         run: |
-          cmd=(python -m src.library_autopilot --theme "$THEME" --clips "$CLIPS_COUNT" --publish "$PUBLISH_MODE")
+          cmd=(python -u -m src.library_autopilot --theme "$THEME" --clips "$CLIPS_COUNT" --publish "$PUBLISH_MODE")
           if [ -n "$FORCE_VIDEO_ID" ]; then
             cmd+=(--force-id "$FORCE_VIDEO_ID")
           fi
@@ -162,6 +163,7 @@ jobs:
       - name: 🌐 Configuration Réseau Anti-Blocage (Cloudflare WARP)
         if: ${{ github.event.inputs.use_warp != 'false' }}
         uses: fscarmen/warp-on-actions@v1.4
+        timeout-minutes: 2
         continue-on-error: true
         with:
           stack: dual
@@ -208,7 +210,7 @@ jobs:
           USE_WARP: ${{ github.event.inputs.use_warp || 'true' }}
           ABORT_IF_YOUTUBE_BLOCKED: "0"
         run: |
-          cmd=(python -m src.library_autopilot --theme "$THEME" --clips "$CLIPS_COUNT" --publish "$PUBLISH_MODE")
+          cmd=(python -u -m src.library_autopilot --theme "$THEME" --clips "$CLIPS_COUNT" --publish "$PUBLISH_MODE")
           if [ -n "$FORCE_VIDEO_ID" ]; then
             cmd+=(--force-id "$FORCE_VIDEO_ID")
           fi
