@@ -4,8 +4,9 @@ import subprocess
 from typing import List, Dict, Any, Optional
 
 def parse_vtt_timestamp(ts_str: str) -> float:
-    """Convertit un timestamp VTT '00:01:23.456' ou '01:23.456' en secondes."""
-    parts = ts_str.strip().split(":")
+    """Convertit un timestamp VTT/SRT '00:01:23.456', '00:01:23,456' ou '01:23.456' en secondes."""
+    normalized = ts_str.strip().replace(",", ".")
+    parts = normalized.split(":")
     if len(parts) == 3:
         h, m, s = parts
         return int(h) * 3600 + int(m) * 60 + float(s)
@@ -83,8 +84,12 @@ class VideoTranscriber:
         current_end = None
         current_text = []
         last_cue_text: Optional[str] = None
+        in_note_block = False
 
-        time_pattern = re.compile(r'(\d+:\d+:[\d\.]+|\d+:[\d\.]+)\s*-->\s*(\d+:\d+:[\d\.]+|\d+:[\d\.]+)')
+        time_pattern = re.compile(
+            r'(\d+:\d+:[\d\.,]+|\d+:[\d\.,]+)\s*-->\s*(\d+:\d+:[\d\.,]+|\d+:[\d\.,]+)'
+        )
+        header_prefixes = ("WEBVTT", "Kind:", "Language:", "STYLE", "REGION")
 
         def _add_segment(start: float, end: float, raw_text_lines: List[str]) -> None:
             nonlocal last_cue_text
@@ -141,14 +146,28 @@ class VideoTranscriber:
 
         for line in lines:
             line_str = line.strip()
+            if not line_str:
+                in_note_block = False
+                continue
+
             match = time_pattern.search(line_str)
             if match:
+                in_note_block = False
                 if current_start is not None and current_text:
                     _add_segment(current_start, current_end, current_text)
                 current_start = parse_vtt_timestamp(match.group(1))
                 current_end = parse_vtt_timestamp(match.group(2))
                 current_text = []
-            elif line_str and not line_str.startswith("WEBVTT") and not line_str.isdigit() and "-->" not in line_str:
+                continue
+
+            if line_str.startswith("NOTE") and (len(line_str) == 4 or line_str[4].isspace()):
+                in_note_block = True
+                continue
+            if in_note_block:
+                continue
+            if any(line_str.startswith(prefix) for prefix in header_prefixes):
+                continue
+            if current_start is not None and not line_str.isdigit() and "-->" not in line_str:
                 current_text.append(line_str)
 
         if current_start is not None and current_text:

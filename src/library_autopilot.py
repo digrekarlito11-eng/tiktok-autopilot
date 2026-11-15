@@ -1,6 +1,8 @@
 import os
 import sys
 import json
+import tempfile
+import logging
 import argparse
 import subprocess
 from datetime import datetime, timezone
@@ -13,9 +15,12 @@ except ImportError:
     from pipeline import TikTokPipeline
     from gospel_intelligence import GospelIntelligence
 
+logger = logging.getLogger(__name__)
+
 DEFAULT_PLAYLIST_URL = "https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ"
 HISTORY_FILE = os.path.join("history", "processed_videos.json")
 REPORT_FILE = os.path.join("history", "LAST_AUTOPILOT_REPORT.md")
+MAX_HISTORY_ENTRIES = 200
 
 
 class LibraryAutopilot:
@@ -47,7 +52,7 @@ class LibraryAutopilot:
         self.output_dir = output_dir
         self.theme = theme
         self.watermark = watermark
-        self.publish_mode = publish_mode
+        self.publish_mode = (publish_mode or "public").strip() or "public"
         self.clips_count = clips_count
 
         os.makedirs(os.path.dirname(self.history_path) or ".", exist_ok=True)
@@ -58,7 +63,13 @@ class LibraryAutopilot:
         if os.path.exists(self.history_path):
             try:
                 with open(self.history_path, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    data = json.load(f)
+                if isinstance(data, dict):
+                    data.setdefault("processed_video_ids", [])
+                    data.setdefault("processed_clip_keys", [])
+                    data.setdefault("history", [])
+                    data.setdefault("total_processed", len(data.get("processed_video_ids", [])))
+                    return data
             except Exception as e:
                 print(f"⚠️ Erreur lecture historique ({e}), réinitialisation...")
         return {
@@ -67,16 +78,36 @@ class LibraryAutopilot:
             "last_updated": None,
             "total_processed": 0,
             "processed_video_ids": [],
+            "processed_clip_keys": [],
             "history": []
         }
 
     def _save_history(self) -> None:
-        """Sauvegarde atomique du registre d'historique."""
-        os.makedirs(os.path.dirname(self.history_path) or ".", exist_ok=True)
+        """Sauvegarde atomique du registre d'historique via fichier temporaire et os.replace."""
+        parent_dir = os.path.dirname(os.path.abspath(self.history_path)) or "."
+        os.makedirs(parent_dir, exist_ok=True)
         self.history_data["last_updated"] = datetime.now(timezone.utc).isoformat()
-        self.history_data["total_processed"] = len(self.history_data.get("processed_video_ids", []))
-        with open(self.history_path, "w", encoding="utf-8") as f:
-            json.dump(self.history_data, f, indent=2, ensure_ascii=False)
+        self.history_data.setdefault("processed_video_ids", [])
+        self.history_data.setdefault("processed_clip_keys", [])
+        self.history_data.setdefault("history", [])
+        if len(self.history_data["history"]) > MAX_HISTORY_ENTRIES:
+            self.history_data["history"] = self.history_data["history"][-MAX_HISTORY_ENTRIES:]
+        self.history_data["total_processed"] = len(self.history_data["processed_video_ids"])
+
+        fd, tmp_path = tempfile.mkstemp(prefix=".processed_videos_", suffix=".tmp", dir=parent_dir)
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                json.dump(self.history_data, f, indent=2, ensure_ascii=False)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(tmp_path, self.history_path)
+        except Exception:
+            if os.path.exists(tmp_path):
+                try:
+                    os.remove(tmp_path)
+                except OSError:
+                    pass
+            raise
         print(f"💾 [Autopilot] Registre mis à jour : {len(self.history_data['processed_video_ids'])} vidéo(s) enregistrée(s).")
 
     def fetch_playlist_items(self) -> List[Dict[str, Any]]:
@@ -368,8 +399,17 @@ class LibraryAutopilot:
                 else:
                     report_status = "ECHEC_ENVOI_TIKTOK"
 
-            # N'enregistrer la vidéo comme terminée que si le transfert (ou génération locale si publish=none) a réussi
+            # Suivi d'idempotence par clip (processed_clip_keys) et par vidéo
             v_id = target_video["id"]
+            self.history_data.setdefault("processed_clip_keys", [])
+            for idx_c, c in enumerate(clips, start=1):
+                c_num = c.get("clip_number") or idx_c
+                pub_st = (c.get("publication") or {}).get("status", "ready")
+                if self.publish_mode == "none" or pub_st == "success":
+                    clip_key = f"{v_id}:clip_{c_num}"
+                    if clip_key not in self.history_data["processed_clip_keys"]:
+                        self.history_data["processed_clip_keys"].append(clip_key)
+
             if cycle_success:
                 if v_id not in self.history_data["processed_video_ids"]:
                     self.history_data["processed_video_ids"].append(v_id)
@@ -439,6 +479,15 @@ class LibraryAutopilot:
             raise e
 
 
+def resolve_publish_mode(env_val: Optional[str], cli_default: str = "public") -> str:
+    """Résout le mode de publication en ignorant les chaînes vides ou invalides."""
+    candidate = (env_val or "").strip().lower()
+    if candidate in ("public", "draft", "none"):
+        return candidate
+    fallback = (cli_default or "public").strip().lower()
+    return fallback if fallback in ("public", "draft", "none") else "public"
+
+
 def main():
     parser = argparse.ArgumentParser(description="Autopilot 24/7 Bibliothèque YouTube -> Publication Directe TikTok")
     parser.add_argument("--playlist", type=str, default=DEFAULT_PLAYLIST_URL, help="URL de la bibliothèque YouTube")
@@ -451,9 +500,9 @@ def main():
 
     args = parser.parse_args()
 
-    # Prise en charge des variables d'environnement
-    force_id = args.force_id or os.environ.get("FORCE_VIDEO_ID")
-    publish_mode = os.environ.get("PUBLISH_MODE", args.publish)
+    # Prise en charge des variables d'environnement (chaîne vide fallback sur args.publish)
+    force_id = (args.force_id or os.environ.get("FORCE_VIDEO_ID") or "").strip() or None
+    publish_mode = resolve_publish_mode(os.environ.get("PUBLISH_MODE"), args.publish)
 
     bot = LibraryAutopilot(
         playlist_url=args.playlist,

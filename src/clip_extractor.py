@@ -223,31 +223,39 @@ class ClipExtractor:
         candidates = []
         n = len(segments)
 
+        # Pré-calcul O(n) du score viral, des mots-clés et du nombre de mots par segment
+        seg_scores: List[float] = []
+        seg_keywords: List[set] = []
+        seg_word_counts: List[int] = []
+
+        for seg in segments:
+            seg_text = seg.get("text", "")
+            words = seg_text.split()
+            seg_word_counts.append(len(words))
+            s_score = 0.0
+            s_kws = set()
+            for w in words:
+                kw_score, kw_matched = find_keyword_match(w)
+                if kw_score > 0 and kw_matched:
+                    s_score += kw_score
+                    s_kws.add(kw_matched)
+            seg_scores.append(s_score)
+            seg_keywords.append(s_kws)
+
         for i in range(n):
             start_t = segments[i]["start"]
             current_text = []
             viral_score = 0.0
+            word_count = 0
             matched_keywords_set = set()
 
             for j in range(i, n):
                 end_t = segments[j]["end"]
                 seg_text = segments[j]["text"]
                 current_text.append(seg_text)
-
-                # Calcul du score viral basé sur les mots clés français avec élision & pluriels
-                words = seg_text.split()
-                for w in words:
-                    kw_score, kw_matched = find_keyword_match(w)
-                    if kw_score > 0 and kw_matched:
-                        viral_score += kw_score
-                        matched_keywords_set.add(kw_matched)
-                    cleaned_w = w.strip("-_–—«»\"'()[]{}...,;!? ")
-                    if "-" in cleaned_w:
-                        for part in cleaned_w.split("-"):
-                            p_score, p_kw = find_keyword_match(part)
-                            if p_score > 0 and p_kw and p_kw != kw_matched:
-                                viral_score += p_score
-                                matched_keywords_set.add(p_kw)
+                viral_score += seg_scores[j]
+                word_count += seg_word_counts[j]
+                matched_keywords_set.update(seg_keywords[j])
 
                 duration = end_t - start_t
                 if duration >= self.min_duration:
@@ -257,8 +265,7 @@ class ClipExtractor:
                         gospel_meta = GospelIntelligence.analyze_segment_spirituality(cand_text)
 
                         # Bonus de densité de mots et cadence
-                        word_count = sum(len(t.split()) for t in current_text)
-                        cadence = word_count / duration # mots par seconde
+                        cadence = word_count / duration  # mots par seconde
                         cadence_bonus = 1.0 if 1.8 <= cadence <= 4.2 else 0.6
 
                         # Score global : Mots clés + Aimant à commentaires (Comment Magnet)

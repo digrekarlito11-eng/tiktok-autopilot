@@ -8,31 +8,40 @@ la barre de progression dynamique et le traitement par lot.
 
 import os
 import sys
+import tempfile
 import argparse
 import subprocess
+from typing import Optional
 from src.pipeline import TikTokPipeline
 
-def run_synthetic_demo(output_dir: str, theme: str = "gold", watermark: str = "@karlstudio"):
+def run_synthetic_demo(
+    output_dir: str,
+    theme: str = "gold",
+    watermark: str = "@karlstudio",
+    temp_dir: Optional[str] = None
+):
     """
     Crée une vidéo test de 35 secondes avec sous-titres et génère le TikTok final
     pour valider l'ensemble de la chaîne avec les nouveaux habillages graphiques.
     """
     print(f"🎬 [Mode Démo] Génération d'un exemple TikTok (Thème: {theme}, Watermark: {watermark})...")
-    os.makedirs("downloads", exist_ok=True)
-    demo_video = "downloads/demo_source.mp4"
-    demo_vtt = "downloads/demo_source.vtt"
 
-    create_cmd = [
-        "ffmpeg", "-y",
-        "-f", "lavfi", "-i", "testsrc=duration=35:size=1280x720:rate=30",
-        "-f", "lavfi", "-i", "sine=frequency=440:duration=35",
-        "-c:v", "libx264", "-preset", "ultrafast",
-        "-c:a", "aac",
-        demo_video
-    ]
-    subprocess.run(create_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+    def _run_in_dir(work_temp_dir: str):
+        os.makedirs(work_temp_dir, exist_ok=True)
+        demo_video = os.path.join(work_temp_dir, "demo_source.mp4")
+        demo_vtt = os.path.join(work_temp_dir, "demo_source.vtt")
 
-    vtt_content = """WEBVTT
+        create_cmd = [
+            "ffmpeg", "-y",
+            "-f", "lavfi", "-i", "testsrc=duration=35:size=1280x720:rate=30",
+            "-f", "lavfi", "-i", "sine=frequency=440:duration=35",
+            "-c:v", "libx264", "-preset", "ultrafast",
+            "-c:a", "aac",
+            demo_video
+        ]
+        subprocess.run(create_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+
+        vtt_content = """WEBVTT
 
 00:00:00.500 --> 00:00:04.000
 Voici le grand secret que 99% des créateurs ignorent.
@@ -52,24 +61,29 @@ Voici exactement la méthode pour captiver l'attention dès les trois premières
 00:00:28.500 --> 00:00:34.000
 Abonne-toi maintenant et découvre Karl Studio dès aujourd'hui.
 """
-    with open(demo_vtt, "w", encoding="utf-8") as f:
-        f.write(vtt_content)
+        with open(demo_vtt, "w", encoding="utf-8") as f:
+            f.write(vtt_content)
 
-    pipeline = TikTokPipeline(
-        output_dir=output_dir,
-        temp_dir="downloads",
-        theme_name=theme,
-        watermark=watermark,
-        with_progress_bar=True
-    )
-    result = pipeline._process_video_file(
-        video_path=demo_video,
-        video_title="Masterclass Karl Studio",
-        subtitle_path=demo_vtt,
-        top_k=1
-    )
-    print("\n✅ [Mode Démo] Démonstration réussie avec succès !")
-    return result
+        pipeline = TikTokPipeline(
+            output_dir=output_dir,
+            temp_dir=work_temp_dir,
+            theme_name=theme,
+            watermark=watermark,
+            with_progress_bar=True
+        )
+        result = pipeline._process_video_file(
+            video_path=demo_video,
+            video_title="Masterclass Karl Studio",
+            subtitle_path=demo_vtt,
+            top_k=1
+        )
+        print("\n✅ [Mode Démo] Démonstration réussie avec succès !")
+        return result
+
+    if temp_dir:
+        return _run_in_dir(temp_dir)
+    with tempfile.TemporaryDirectory(prefix="tiktok_demo_") as isolated_dir:
+        return _run_in_dir(isolated_dir)
 
 def main():
     parser = argparse.ArgumentParser(description="TikTok Autopilot — Usine automatisée de clips TikTok pour Karl")

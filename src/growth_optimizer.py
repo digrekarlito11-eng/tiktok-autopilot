@@ -16,14 +16,40 @@ class GrowthOptimizer:
     def __init__(self):
         pass
 
+    DEFAULT_HOOK = "DIEU A UN MESSAGE POUR TOI AUJOURD'HUI ✝️"
+    GOSPEL_DEFAULT_FALLBACK_HOOK = "TU N'ES PAS NÉ POUR ACCOMPAGNER LES AUTRES 🕊️"
+
+    @staticmethod
+    def _has_any_word(text_lower: str, words: List[str]) -> bool:
+        """Vérifie la présence d'au moins un mot ou expression entière (frontières de mots \b)."""
+        for w in words:
+            if w in ("foi", "mari", "paix"):
+                pattern = rf"\b{re.escape(w)}\b"
+            else:
+                pattern = rf"\b{re.escape(w)}s?\b"
+            if re.search(pattern, text_lower):
+                return True
+        return False
+
     def generate_growth_package(self, clip_info: Dict[str, Any], video_title: str) -> Dict[str, Any]:
         text = clip_info.get("text", "")
         first_sentence = clip_info.get("first_sentence", "")
 
         # 1. Détermination du Hook pour le bandeau supérieur de la vidéo
-        hook_banner = self._generate_hook_banner(first_sentence, text)
-        if hook_banner == "DIEU A UN MESSAGE POUR TOI AUJOURD'HUI ✝️" and clip_info.get("recommended_hook"):
-            hook_banner = clip_info.get("recommended_hook")
+        # Priorité au Hook de la première phrase ou à l'archétype GospelIntelligence quand pertinent
+        first_hook = self._generate_hook_banner(first_sentence, "")
+        gospel_hook = clip_info.get("recommended_hook")
+        gospel_meta = clip_info.get("gospel_meta") if isinstance(clip_info.get("gospel_meta"), dict) else {}
+        gospel_matched = gospel_meta.get("matched_keywords") or clip_info.get("matched_keywords") or []
+
+        if first_hook != self.DEFAULT_HOOK:
+            hook_banner = first_hook
+        elif gospel_hook and (gospel_hook != self.GOSPEL_DEFAULT_FALLBACK_HOOK or gospel_matched):
+            hook_banner = gospel_hook
+        else:
+            hook_banner = self._generate_hook_banner(first_sentence, text)
+            if hook_banner == self.DEFAULT_HOOK and gospel_hook:
+                hook_banner = gospel_hook
 
         # 2. Appel à l'action pour maximiser les commentaires (Comment Magnet)
         cta = clip_info.get("recommended_cta") or "Écris 'AMEN' en commentaire pour sceller cette bénédiction 👇"
@@ -65,30 +91,30 @@ class GrowthOptimizer:
         """Produit une phrase choc courte pour le bandeau supérieur spécial prédication chrétienne."""
         text_lower = (first_sentence + " " + full_text).lower()
 
-        if any(w in text_lower for w in ["prophétie", "prophétique", "annoncer"]):
+        if self._has_any_word(text_lower, ["prophétie", "prophetie", "prophétique", "prophetique", "annoncer"]):
             return "ÉCOUTE CE MESSAGE PROPHÉTIQUE 🕊️"
-        elif any(w in text_lower for w in ["miracle", "impossible", "témoignage"]):
+        elif self._has_any_word(text_lower, ["miracle", "impossible", "témoignage", "temoignage"]):
             return "LE MIRACLE QUE TU ATTENDS ARRIVE ⚡"
-        elif any(w in text_lower for w in ["combat", "ennemi", "délivrance", "victoire"]):
+        elif self._has_any_word(text_lower, ["combat", "ennemi", "délivrance", "delivrance", "victoire"]):
             return "TA VICTOIRE EST PROCHE DÉCLARE-LE ⚔️"
-        elif any(w in text_lower for w in ["mariage", "foyer", "femme", "mari", "conjoint", "célibat", "celibat"]):
+        elif self._has_any_word(text_lower, ["mariage", "foyer", "femme", "mari", "conjoint", "célibat", "celibat"]):
             return "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡"
-        elif any(w in text_lower for w in ["blessure", "blessures", "coeur", "cœur", "guérison", "guerison"]):
+        elif self._has_any_word(text_lower, ["blessure", "blessures", "coeur", "cœur", "guérison", "guerison"]):
             return "DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️"
-        elif any(w in text_lower for w in ["blocage", "malédiction", "malediction", "autel"]):
+        elif self._has_any_word(text_lower, ["blocage", "malédiction", "malediction", "autel"]):
             return "CE CYCLE DE SOUFFRANCE DANS TA FAMILLE S'ARRÊTE AUJOURD'HUI 🔥"
-        elif any(w in text_lower for w in ["destinée", "destinee", "mindset", "pensée", "mentalité"]):
+        elif self._has_any_word(text_lower, ["destinée", "destinee", "mindset", "pensée", "pensee", "mentalité", "mentalite"]):
             return "TU N'ES PAS NÉ POUR ACCOMPAGNER LES AUTRES 🕊️"
-        elif any(w in text_lower for w in ["prière", "prier", "demande"]):
+        elif self._has_any_word(text_lower, ["prière", "priere", "prier", "demande"]):
             return "FAIS CETTE PRIÈRE PUISSANTE 🙏"
-        elif any(w in text_lower for w in ["épreuve", "douleur", "pleurer", "difficile"]):
+        elif self._has_any_word(text_lower, ["épreuve", "epreuve", "douleur", "pleurer", "difficile"]):
             return "POURQUOI CETTE ÉPREUVE DANS TA VIE ? 📖"
-        elif any(w in text_lower for w in ["bénédiction", "bénir", "grâce", "élévation"]):
+        elif self._has_any_word(text_lower, ["bénédiction", "benediction", "bénir", "benir", "grâce", "grace", "élévation", "elevation"]):
             return "CETTE PAROLE VA CHANGER TA VIE ✨"
-        elif any(w in text_lower for w in ["foi", "croire", "douter"]):
+        elif self._has_any_word(text_lower, ["foi", "croire", "douter"]):
             return "NE DOUTE PLUS DE TA DESTINÉE 👑"
         else:
-            return "DIEU A UN MESSAGE POUR TOI AUJOURD'HUI ✝️"
+            return self.DEFAULT_HOOK
 
     def _generate_caption(self, text: str, video_title: str, cta: str = "Écris 'AMEN' en commentaire pour sceller cette bénédiction 👇") -> str:
         """Génère un texte engageant spécial communauté chrétienne."""

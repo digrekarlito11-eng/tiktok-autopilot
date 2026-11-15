@@ -1,5 +1,8 @@
 import os
 import json
+import shutil
+import hashlib
+import logging
 from typing import Dict, Any, Optional, List
 
 from .downloader import VideoDownloader
@@ -9,6 +12,9 @@ from .growth_optimizer import GrowthOptimizer
 from .video_formatter import VideoFormatter
 from .notifier import TikTokNotifier
 from .tiktok_publisher import TikTokPublisher
+
+logger = logging.getLogger(__name__)
+
 
 class TikTokPipeline:
     """
@@ -33,7 +39,7 @@ class TikTokPipeline:
         self.theme_name = theme_name
         self.watermark = watermark
         self.with_progress_bar = with_progress_bar
-        self.publish_mode = publish_mode
+        self.publish_mode = (publish_mode or "draft").strip() or "draft"
 
         os.makedirs(self.output_dir, exist_ok=True)
         os.makedirs(self.temp_dir, exist_ok=True)
@@ -45,6 +51,35 @@ class TikTokPipeline:
         self.formatter = VideoFormatter(output_dir=self.output_dir)
         self.notifier = TikTokNotifier(webhook_url=webhook_url)
         self.publisher = TikTokPublisher()
+
+    @staticmethod
+    def _build_safe_title(video_title: str, video_id: Optional[str] = None) -> str:
+        """
+        Génère un préfixe de fichier sûr et déterministe, sans collision pour les titres longs
+        partageant les 20 premiers caractères (ex: Parties 1, 2, 3 d'une même série).
+        """
+        raw_clean = "".join(c for c in (video_title or "") if c.isalnum() or c in (" ", "_", "-")).strip()
+        prefix = raw_clean[:20].strip()
+        if not prefix:
+            prefix = "video"
+        if len(raw_clean) > 20 or video_id:
+            hash_input = f"{video_title}::{video_id or ''}".encode("utf-8")
+            short_hash = hashlib.sha1(hash_input).hexdigest()[:6]
+            return f"{prefix}_{short_hash}"
+        return prefix
+
+    def _cleanup_session_dir(self, video_path: str) -> None:
+        """Supprime le sous-dossier temporaire downloads/session_* après traitement."""
+        if not video_path:
+            return
+        parent_dir = os.path.dirname(os.path.abspath(video_path))
+        base_name = os.path.basename(parent_dir)
+        if base_name.startswith("session_") and os.path.isdir(parent_dir):
+            try:
+                shutil.rmtree(parent_dir, ignore_errors=True)
+                logger.info("🧹 Dossier de session temporaire nettoyé : %s", parent_dir)
+            except OSError:
+                pass
 
     def process_url(self, url: str, top_k: int = 10) -> Dict[str, Any]:
         """
@@ -58,16 +93,20 @@ class TikTokPipeline:
 
         download_data = self.downloader.download(url)
         video_path = download_data["video_path"]
-        subtitle_path = download_data["subtitle_path"]
-        video_title = download_data["title"]
+        subtitle_path = download_data.get("subtitle_path")
+        video_title = download_data.get("title", "video_source")
 
-        return self._process_video_file(video_path, video_title, subtitle_path, top_k=top_k)
+        try:
+            return self._process_video_file(video_path, video_title, subtitle_path, top_k=top_k)
+        finally:
+            self._cleanup_session_dir(video_path)
 
     def process_batch(self, urls: List[str], top_k: int = 10) -> List[Dict[str, Any]]:
         """
         Traite une série de vidéos en rafale pour préparer le stock de contenu TikTok de Karl.
         """
         results = []
+        all_clips = []
         print(f"\n⚡ [CEO Orchestrateur] Lancement du traitement par lot ({len(urls)} vidéos sources)...")
         for idx, u in enumerate(urls, start=1):
             u_clean = u.strip()
@@ -77,8 +116,23 @@ class TikTokPipeline:
             try:
                 res = self.process_url(u_clean, top_k=top_k)
                 results.append(res)
+                all_clips.extend(res.get("clips", []))
             except Exception as e:
                 print(f"❌ Erreur sur la vidéo {u_clean} : {e}")
+
+        if len(results) > 1:
+            summary_path = os.path.join(self.output_dir, "tiktok_results.json")
+            batch_summary = {
+                "source_title": results[-1].get("source_title", "Batch TikTok"),
+                "clips_count": len(all_clips),
+                "theme": self.theme_name,
+                "watermark": self.watermark,
+                "clips": all_clips,
+                "batch_results": results,
+            }
+            with open(summary_path, "w", encoding="utf-8") as f:
+                json.dump(batch_summary, f, indent=2, ensure_ascii=False)
+
         return results
 
     def process_local_file(self, video_path: str, video_title: Optional[str] = None, top_k: int = 10) -> Dict[str, Any]:
@@ -107,6 +161,7 @@ class TikTokPipeline:
             raise ValueError("Aucun extrait pertinent trouvé dans la durée ciblée.")
 
         generated_clips = []
+        safe_title = self._build_safe_title(video_title)
 
         for idx, clip in enumerate(best_clips, start=1):
             print(f"\n🎯 [Orchestrateur] Traitement de l'extrait #{idx} (Score: {clip['score']}, Durée: {clip['duration']}s)")
@@ -115,7 +170,6 @@ class TikTokPipeline:
             growth_package = self.growth.generate_growth_package(clip, video_title)
 
             # Étape 5 : Rendu vidéo 9:16 vertical (Media-Bot) avec Branding et Barre de progression
-            safe_title = "".join(c for c in video_title if c.isalnum() or c in (' ', '_', '-')).rstrip()[:20].strip()
             output_filename = f"tiktok_{safe_title}_clip_{idx}_{int(clip['start'])}s.mp4"
 
             final_video_path = self.formatter.render_tiktok_video(

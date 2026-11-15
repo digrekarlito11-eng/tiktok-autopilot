@@ -74,7 +74,8 @@ class VideoFormatter:
         ass_path: str,
         clip_start: float,
         watermark: str = "@karlstudio",
-        theme_name: str = "gold"
+        theme_name: str = "gold",
+        clip_duration: Optional[float] = None
     ):
         theme = get_theme(theme_name)
         clean_hook = clean_text_for_ass(hook_title)
@@ -96,8 +97,9 @@ Style: WatermarkBadge,{theme['font_name']},32,&H80FFFFFF,&H80FFFFFF,&H80000000,&
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
-        total_clip_duration = 0.0
-        if segments:
+        if clip_duration is not None and clip_duration > 0:
+            total_clip_duration = float(clip_duration)
+        elif segments:
             total_clip_duration = max(s["end"] - clip_start for s in segments)
         else:
             total_clip_duration = 60.0
@@ -167,7 +169,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             ass_path,
             clip_start=start_time,
             watermark=watermark,
-            theme_name=theme_name
+            theme_name=theme_name,
+            clip_duration=duration
         )
 
         print(f"🎞️ [Media-Bot] Rendu FFmpeg 9:16 (Fond flou + vidéo nette + Safe Zones + Barre animée)...")
@@ -187,9 +190,13 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         )
 
         if with_progress_bar:
-            # Barre de progression dynamique de 14px de hauteur au bas de l'écran
-            progress_expr = f"w='1080*(t/{duration})':h=14:x=0:y=1906:color={theme['progress_color']}@1:t=fill"
-            final_filter = f"{base_filter};[subbed]drawbox={progress_expr}[outv]"
+            # Barre de progression dynamique de 14px de hauteur au bas de l'écran (compatible FFmpeg 5.1 par évaluation par trame d'overlay)
+            safe_dur = max(0.01, float(duration))
+            progress_filter = (
+                f"color=c={theme['progress_color']}@1:s=1080x14:r=30[pbar];"
+                f"[subbed][pbar]overlay=x='-W+W*(t/{safe_dur})':y=1906:shortest=1[outv]"
+            )
+            final_filter = f"{base_filter};{progress_filter}"
         else:
             final_filter = f"{base_filter};[subbed]copy[outv]"
 

@@ -1,8 +1,13 @@
 import os
 import json
+import time
+import logging
 import urllib.request
 import urllib.error
 from typing import Dict, Any, Optional
+
+logger = logging.getLogger(__name__)
+
 
 class TikTokPublisher:
     """
@@ -13,14 +18,55 @@ class TikTokPublisher:
     3. Le pont Webhook / Multi-plateforme (Buffer, Ayrshare, Make, Telegram).
     """
 
-    def __init__(self, access_token: Optional[str] = None, session_id: Optional[str] = None):
+    AUTH_ERROR_CODES = {
+        "access_token_invalid",
+        "token_expired",
+        "invalid_token",
+        "unauthorized",
+        "scope_not_authorized",
+    }
+
+    def __init__(
+        self,
+        access_token: Optional[str] = None,
+        session_id: Optional[str] = None,
+        max_retries: int = 2,
+        retry_delay: float = 0.01,
+    ):
         self.access_token = access_token or os.environ.get("TIKTOK_ACCESS_TOKEN")
         self.session_id = session_id or os.environ.get("TIKTOK_SESSION_ID")
         self.api_base_url = "https://open.tiktokapis.com/v2/post/publish/video/init/"
+        self.max_retries = max(0, int(max_retries))
+        self.retry_delay = max(0.0, float(retry_delay))
         if self.session_id:
             print("🔑 [DevOps-Bot] Session TikTok Studio détectée via TIKTOK_SESSION_ID (Méthode 1 active).")
 
-    def upload_video_binary(self, upload_url: str, video_path: str) -> int:
+    def _urlopen_with_retry(self, req: urllib.request.Request, timeout: float = 15):
+        """
+        Exécute une requête HTTP avec retries et backoff exponentiel sur erreurs transitoires (429, 5xx, URLError).
+        """
+        last_exc: Optional[Exception] = None
+        for attempt in range(self.max_retries + 1):
+            try:
+                return urllib.request.urlopen(req, timeout=timeout)
+            except urllib.error.HTTPError as e:
+                last_exc = e
+                if e.code in (429, 500, 502, 503, 504) and attempt < self.max_retries:
+                    if self.retry_delay > 0:
+                        time.sleep(self.retry_delay * (2 ** attempt))
+                    continue
+                raise
+            except urllib.error.URLError as e:
+                last_exc = e
+                if attempt < self.max_retries:
+                    if self.retry_delay > 0:
+                        time.sleep(self.retry_delay * (2 ** attempt))
+                    continue
+                raise
+        if last_exc:
+            raise last_exc
+
+    def upload_video_binary(self, upload_url: str, video_path: str, reject_empty: bool = False) -> int:
         """
         Phase 2 de l'API TikTok : Envoi du flux binaire vidéo via HTTP PUT.
         """
@@ -28,6 +74,9 @@ class TikTokPublisher:
             raise FileNotFoundError(f"Fichier vidéo introuvable pour téléversement : {video_path}")
 
         video_size = os.path.getsize(video_path)
+        if video_size <= 0 and reject_empty:
+            raise ValueError(f"Fichier vidéo vide (0 octet) refusé pour téléversement : {video_path}")
+
         with open(video_path, "rb") as f:
             video_bytes = f.read()
 
@@ -43,7 +92,7 @@ class TikTokPublisher:
             headers=headers,
             method="PUT"
         )
-        with urllib.request.urlopen(req, timeout=60) as resp:
+        with self._urlopen_with_retry(req, timeout=60) as resp:
             status = getattr(resp, "status", 200)
             print(f"✅ [DevOps-Bot] Téléversement binaire TikTok réussi (HTTP {status})")
             return status
@@ -59,7 +108,8 @@ class TikTokPublisher:
         Si aucun Token TikTok n'est configuré, génère le payload prêt pour l'API et la passerelle.
         """
         video_filename = os.path.basename(video_path)
-        video_size = os.path.getsize(video_path) if os.path.exists(video_path) else 0
+        video_exists = os.path.exists(video_path)
+        video_size = os.path.getsize(video_path) if video_exists else 0
 
         post_caption = growth_package.get("full_post_text", "")
         hook = growth_package.get("hook_banner", "")
@@ -92,6 +142,16 @@ class TikTokPublisher:
         with open(payload_file, "w", encoding="utf-8") as f:
             json.dump(tiktok_payload, f, indent=2, ensure_ascii=False)
 
+        if video_exists and video_size <= 0:
+            err_msg = f"Fichier vidéo vide (0 octet) : {video_path}"
+            logger.error(err_msg)
+            return {
+                "status": "error",
+                "method": "official_api" if self.access_token else ("tiktok_studio_playwright" if self.session_id else "ready_package"),
+                "error": err_msg,
+                "payload_file": payload_file
+            }
+
         # Si un token officiel TikTok est présent dans les Secrets GitHub
         if self.access_token:
             try:
@@ -105,18 +165,38 @@ class TikTokPublisher:
                         "Content-Type": "application/json"
                     }
                 )
-                with urllib.request.urlopen(req, timeout=15) as resp:
+                with self._urlopen_with_retry(req, timeout=15) as resp:
                     resp_data = json.loads(resp.read().decode("utf-8"))
                     print(f"✅ [DevOps-Bot] Réponse TikTok API Init : {resp_data}")
+
+                error_obj = resp_data.get("error") if isinstance(resp_data.get("error"), dict) else {}
+                error_code = str(error_obj.get("code") or "").strip()
+                error_message = str(error_obj.get("message") or "").strip()
 
                 data_obj = resp_data.get("data", {}) if isinstance(resp_data.get("data"), dict) else resp_data
                 upload_url = data_obj.get("upload_url") or resp_data.get("upload_url")
                 publish_id = data_obj.get("publish_id") or resp_data.get("publish_id")
 
+                if error_code and error_code.lower() != "ok":
+                    err_status = "auth_error" if error_code.lower() in self.AUTH_ERROR_CODES else "error"
+                    err_detail = f"TikTok API error ({error_code}): {error_message}" if error_message else f"TikTok API error: {error_code}"
+                    logger.warning("⚠️ [DevOps-Bot] %s", err_detail)
+                    return {
+                        "status": err_status,
+                        "method": "official_api",
+                        "error": err_detail,
+                        "error_code": error_code,
+                        "publish_id": publish_id,
+                        "upload_url": upload_url,
+                        "upload_status": None,
+                        "response": resp_data,
+                        "payload_file": payload_file
+                    }
+
                 upload_status = None
                 if upload_url:
                     print(f"📤 [DevOps-Bot] Téléversement du binaire vidéo (Phase 2: PUT)...")
-                    upload_status = self.upload_video_binary(upload_url, video_path)
+                    upload_status = self.upload_video_binary(upload_url, video_path, reject_empty=True)
 
                 return {
                     "status": "success",
