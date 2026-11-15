@@ -69,12 +69,40 @@ def run_probe(video_path: str, out_dir: str) -> Dict[str, Any]:
                     row_btns.nth(rc - 1).click(timeout=5000)
                     more_clicked = True
                 report["findings"]["row_buttons_detected"] = {"all": n, "first_row": rc}
+                if not more_clicked:
+                    # Repli : la liste Studio n'est pas un <table>. On vise l'icône "..."
+                    # de la 1re ligne (colonne Actions) : élément cliquable le plus à droite
+                    # sur la hauteur de la première vignette.
+                    pos = page.evaluate(r"""() => {
+                        const thumbs = Array.from(document.querySelectorAll('img')).filter(i => {
+                            const r = i.getBoundingClientRect(); return r.width > 40 && r.height > 60 && r.left > 250 && r.top > 150;
+                        });
+                        if (!thumbs.length) return null;
+                        const t = thumbs[0].getBoundingClientRect();
+                        const cy = t.top + t.height / 2;
+                        const cands = Array.from(document.querySelectorAll('button, [role=button], div, span, svg')).filter(e => {
+                            const r = e.getBoundingClientRect();
+                            return r.width > 10 && r.width < 60 && r.height > 10 && r.height < 60 && Math.abs((r.top + r.height/2) - cy) < 20;
+                        });
+                        if (!cands.length) return null;
+                        cands.sort((a, b) => b.getBoundingClientRect().left - a.getBoundingClientRect().left);
+                        const r = cands[0].getBoundingClientRect();
+                        return {x: r.left + r.width / 2, y: r.top + r.height / 2};
+                    }""")
+                    report["findings"]["more_fallback_pos"] = pos
+                    if pos:
+                        page.mouse.click(pos["x"], pos["y"])
+                        more_clicked = True
             except Exception as e_more:
                 report["findings"]["more_menu_error"] = str(e_more)[:200]
             time.sleep(2)
             page.screenshot(path=os.path.join(out_dir, "story_02_more_menu.png"), full_page=False)
             if more_clicked:
                 menu_text = page.inner_text("body") or ""
+                before = set(l.strip() for l in body.splitlines() if l.strip())
+                report["findings"]["more_menu_new_lines"] = [
+                    l.strip() for l in menu_text.splitlines() if l.strip() and l.strip() not in before
+                ][:40]
                 report["findings"]["more_menu_story_lines"] = _story_lines(menu_text)
                 try:
                     menu_items = page.evaluate(r"""() => Array.from(document.querySelectorAll(
