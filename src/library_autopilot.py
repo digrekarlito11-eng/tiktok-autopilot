@@ -110,10 +110,21 @@ class LibraryAutopilot:
             raise
         print(f"💾 [Autopilot] Registre mis à jour : {len(self.history_data['processed_video_ids'])} vidéo(s) enregistrée(s).")
 
+    @staticmethod
+    def _is_unavailable_video_entry(data: Dict[str, Any]) -> bool:
+        """Détecte les vidéos privées, supprimées ou indisponibles dans une playlist YouTube."""
+        title = str(data.get("title") or "").strip().lower()
+        availability = str(data.get("availability") or "").strip().lower()
+        if title in ("[private video]", "[deleted video]", "private video", "deleted video", "[vidéo privée]", "[vidéo supprimée]"):
+            return True
+        if availability in ("private", "needs_auth", "subscriber_only", "premium_only"):
+            return True
+        return False
+
     def fetch_playlist_items(self) -> List[Dict[str, Any]]:
         """
         Interroge la bibliothèque YouTube pour récupérer la liste ordonnée des prédications.
-        Utilise yt-dlp avec contournement anti-datacenter.
+        Utilise yt-dlp avec contournement anti-datacenter et ignore les vidéos privées/supprimées.
         """
         print(f"📡 [Autopilot 24/7] Analyse de la bibliothèque YouTube : {self.playlist_url}")
         cookies_file = os.environ.get("YOUTUBE_COOKIES_FILE")
@@ -144,6 +155,7 @@ class LibraryAutopilot:
             try:
                 res = subprocess.run(cmd, capture_output=True, text=True, check=True)
                 items = []
+                skipped_private = 0
                 for line in res.stdout.strip().split("\n"):
                     if not line.strip():
                         continue
@@ -151,6 +163,10 @@ class LibraryAutopilot:
                         data = json.loads(line)
                         v_id = data.get("id")
                         if v_id:
+                            if self._is_unavailable_video_entry(data):
+                                skipped_private += 1
+                                print(f"⏭️ [Autopilot] Vidéo ignorée car privée/supprimée sur YouTube : {v_id} ({data.get('title')})")
+                                continue
                             items.append({
                                 "id": v_id,
                                 "title": data.get("title", f"Vidéo {v_id}"),
@@ -161,7 +177,9 @@ class LibraryAutopilot:
                             })
                     except json.JSONDecodeError:
                         continue
-                print(f"✅ [Autopilot] {len(items)} prédication(s) répertoriée(s) dans la bibliothèque de Karl.")
+                if skipped_private > 0:
+                    print(f"ℹ️ [Autopilot] {skipped_private} vidéo(s) privée(s)/indisponible(s) écartée(s) de la file.")
+                print(f"✅ [Autopilot] {len(items)} prédication(s) disponible(s) dans la bibliothèque de Karl.")
                 return items
             except Exception as e:
                 last_error = e
