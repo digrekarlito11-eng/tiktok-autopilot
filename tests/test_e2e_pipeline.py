@@ -202,8 +202,9 @@ class TestRealWorldPreachingWorkflow:
 
         clip_info = results["clips"][0]
         assert clip_info["hook"] == "ÉCOUTE CE MESSAGE PROPHÉTIQUE 🕊️"
-        assert "#cotedivoire" in clip_info["hashtags"]
-        assert "#abidjan" in clip_info["hashtags"]
+        assert "#JesusChrist" in clip_info["hashtags"]
+        assert "#FoiEnDieu" in clip_info["hashtags"]
+        assert len(clip_info["hashtags"]) == 5
 
         # 2. Output MP4 file validation
         final_video_path = clip_info["video_path"]

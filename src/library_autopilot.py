@@ -280,7 +280,7 @@ class LibraryAutopilot:
                     "",
                     "### 🚀 Publication Directe Activée pour Karl",
                     "1. Ouvre ton profil TikTok : les Shorts validés sont déjà en ligne sur ton fil public !",
-                    "2. Chaque vidéo contient son accroche visuelle, ses sous-titres Gospel Gold et ses hashtags (#mariage, #foi, #chretien).",
+                    "2. Chaque vidéo contient son accroche visuelle, ses sous-titres Gospel Gold et ses nouveaux hashtags chrétiens ciblés (#Predication, #Priere, #Gospel, #JesusChrist, #FoiEnDieu).",
                     "3. L'Autopilot continuera automatiquement au prochain cycle (06h00 & 18h00 GMT).",
                     ""
                 ])
@@ -290,7 +290,7 @@ class LibraryAutopilot:
                     "### 💡 Prochaine Étape pour Karl",
                     "1. Ouvre ton application TikTok sur ton téléphone.",
                     "2. Rends-toi dans ton profil > **Brouillons**.",
-                    "3. Les vidéos y sont déjà pré-remplies avec l'accroche, les hashtags (#mariage, #foi, #chretien) et le texte.",
+                    "3. Les vidéos y sont déjà pré-remplies avec l'accroche, les nouveaux hashtags chrétiens (#Predication, #Priere, #Gospel, #JesusChrist) et le texte.",
                     "4. Clique sur 'Publier' au moment où tu le souhaites !",
                     ""
                 ])

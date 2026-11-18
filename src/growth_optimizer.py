@@ -1,6 +1,8 @@
 import json
+import os
 import re
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
+
 
 class GrowthOptimizer:
     """
@@ -8,13 +10,58 @@ class GrowthOptimizer:
     Génère l'ensemble du package stratégique pour chaque extrait :
     - Hook percutant pour stopper le swipe
     - Description optimisée SEO TikTok avec CTA (Appel à l'action)
-    - Sélection des hashtags viraux
+    - Sélection des hashtags viraux chrétiens (3 packs ciblés de 5 hashtags)
     - Meilleur créneau horaire recommandé pour poster
     - Redirection vers l'écosystème Karl Studio (Waitlist / Musique)
     """
 
-    def __init__(self):
-        pass
+    HASHTAG_PACKS: Dict[str, List[str]] = {
+        "predication": [
+            "#Predication",
+            "#Evangile",
+            "#JesusChrist",
+            "#FoiEnDieu",
+            "#ChristianTikTok",
+        ],
+        "priere": [
+            "#Priere",
+            "#PriereDuJour",
+            "#JesusChrist",
+            "#FoiEnDieu",
+            "#CotedIvoire",
+        ],
+        "gospel": [
+            "#Gospel",
+            "#MusiqueChretienne",
+            "#Louange",
+            "#JesusChrist",
+            "#GospelAfricain",
+        ],
+    }
+
+    HASHTAG_CATEGORY_KEYWORDS: Dict[str, List[str]] = {
+        "gospel": [
+            "gospel", "louange", "adoration", "cantique", "chant", "chanter",
+            "musique", "chanson", "chorale", "worship", "mélodie", "melodie",
+            "instrument", "psaume chanté",
+        ],
+        "priere": [
+            "prière", "priere", "prières", "prieres", "prier", "prie",
+            "intercession", "jeûne", "jeune", "supplication", "délivrance",
+            "delivrance", "combat spirituel", "guérison", "guerison",
+            "prophétie", "prophetie", "miracle",
+        ],
+        "predication": [
+            "prédication", "predication", "évangile", "evangile", "enseignement",
+            "message", "sermon", "parole", "bible", "verset", "mariage",
+            "destinée", "destinee", "foi", "pasteur", "église", "eglise",
+        ],
+    }
+
+    RECOMMENDATIONS_PATH = "history/growth_recommendations.json"
+
+    def __init__(self, recommendations_path: Optional[str] = None):
+        self.recommendations_path = recommendations_path or self.RECOMMENDATIONS_PATH
 
     DEFAULT_HOOK = "DIEU A UN MESSAGE POUR TOI AUJOURD'HUI ✝️"
     GOSPEL_DEFAULT_FALLBACK_HOOK = "TU N'ES PAS NÉ POUR ACCOMPAGNER LES AUTRES 🕊️"
@@ -52,12 +99,15 @@ class GrowthOptimizer:
                 hook_banner = gospel_hook
 
         # 2. Appel à l'action pour maximiser les commentaires (Comment Magnet)
-        cta = clip_info.get("recommended_cta") or "Écris 'AMEN' en commentaire pour sceller cette bénédiction 👇"
+        recommendations = self._load_dynamic_recommendations()
+        default_cta = recommendations.get("recommended_cta") or "Écris 'AMEN' en commentaire pour sceller cette bénédiction 👇"
+        cta = clip_info.get("recommended_cta") or default_cta
 
         # 3. Génération de la description TikTok (Caption)
         caption = self._generate_caption(text, video_title, cta)
 
-        # 4. Sélection des hashtags performants (Chrétien, Foi, Prédicateurs, Côte d'Ivoire, Viral)
+        # 4. Sélection du pack de 5 hashtags chrétiens ciblés (Prédication / Prière / Gospel)
+        hashtag_pack = self._select_hashtag_category(text, video_title)
         hashtags = self._select_hashtags(text, video_title)
 
         # 5. Score de rétention prévisionnel (optimisé pour vidéos TikTok)
@@ -75,6 +125,7 @@ class GrowthOptimizer:
         package = {
             "hook_banner": hook_banner,
             "caption": caption,
+            "hashtag_pack": hashtag_pack,
             "hashtags": hashtags,
             "full_post_text": f"{caption}\n\n{' '.join(hashtags)}",
             "estimated_retention": f"{estimated_retention}%",
@@ -86,6 +137,17 @@ class GrowthOptimizer:
         }
 
         return package
+
+    def _load_dynamic_recommendations(self) -> Dict[str, Any]:
+        """Charge les recommandations générées par l'agent d'analyse 24/7 si disponibles."""
+        if not self.recommendations_path or not os.path.exists(self.recommendations_path):
+            return {}
+        try:
+            with open(self.recommendations_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data if isinstance(data, dict) else {}
+        except (OSError, json.JSONDecodeError):
+            return {}
 
     def _generate_hook_banner(self, first_sentence: str, full_text: str) -> str:
         """Produit une phrase choc courte pour le bandeau supérieur spécial prédication chrétienne."""
@@ -129,48 +191,27 @@ class GrowthOptimizer:
         ]
         return "\n".join(lines)
 
+    def _select_hashtag_category(self, text: str, video_title: str = "") -> str:
+        """Détermine le pack de hashtags le plus adapté : predication, priere ou gospel."""
+        combined = f"{text or ''} {video_title or ''}".lower()
+        scores: Dict[str, int] = {}
+        for category, keywords in self.HASHTAG_CATEGORY_KEYWORDS.items():
+            score = 0
+            for kw in keywords:
+                if re.search(rf"\b{re.escape(kw)}", combined):
+                    score += 1
+            scores[category] = score
+
+        if scores["gospel"] > 0 and scores["gospel"] >= scores["priere"] and scores["gospel"] >= scores["predication"]:
+            return "gospel"
+        if scores["priere"] > 0 and scores["priere"] >= scores["predication"]:
+            return "priere"
+        return "predication"
+
     def _select_hashtags(self, text: str, video_title: str = "") -> List[str]:
-        """Sélectionne des hashtags viraux chrétiens et géolocalisés Côte d'Ivoire."""
-        base_tags = ["#chretien", "#tiktokchretien", "#pourtoi", "#fyp"]
-        local_tags = ["#cotedivoire", "#abidjan"]
-        theme_tags = ["#priere", "#foi", "#jesus", "#predication"]
-
-        combined = (text + " " + video_title).lower()
-
-        # Tags spécifiques aux thématiques clés
-        if "prophétie" in combined or "prophetie" in combined:
-            theme_tags.insert(0, "#prophetie")
-        if "miracle" in combined:
-            theme_tags.insert(0, "#miracle")
-        if "combat" in combined:
-            theme_tags.insert(0, "#combatspirituel")
-
-        # Tags spécifiques aux prédicateurs et thématiques clés
-        if any(w in combined for w in ["mariage", "foyer", "femme", "mari", "conjoint", "célibat", "celibat"]):
-            theme_tags.append("#mariagechretien")
-            theme_tags.append("#marcelotunasi")
-        if any(w in combined for w in ["destinée", "destinee", "pensée", "mentalité"]):
-            theme_tags.append("#yvancastanou")
-            theme_tags.append("#destinee")
-        if any(w in combined for w in ["blocage", "autel", "cycle", "malédiction", "sanogo"]):
-            theme_tags.append("#mohamedsanogo")
-            theme_tags.append("#delivrance")
-        if any(w in combined for w in ["blessure", "guérison", "guerison", "coeur", "ondo"]):
-            theme_tags.append("#julianaondo")
-            theme_tags.append("#guerison")
-        if any(w in combined for w in ["jeunesse", "esprit de nuit", "djatti"]):
-            theme_tags.append("#yannickdjatti")
-            theme_tags.append("#reveil")
-
-        all_tags = base_tags + local_tags + theme_tags
-        # Dé-doublonnage tout en gardant l'ordre
-        seen = set()
-        deduped = []
-        for tag in all_tags:
-            if tag not in seen:
-                seen.add(tag)
-                deduped.append(tag)
-        return deduped[:10]
+        """Sélectionne l'un des 3 packs de 5 hashtags chrétiens TikTok définis par Karl."""
+        category = self._select_hashtag_category(text, video_title)
+        return list(self.HASHTAG_PACKS[category])
 
     def export_summary_sheet(self, package: Dict[str, Any], output_path: str):
         """Crée une fiche mémo complète pour Karl."""

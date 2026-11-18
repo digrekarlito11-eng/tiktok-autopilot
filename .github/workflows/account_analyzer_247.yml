@@ -1,0 +1,73 @@
+name: 📊 Analyse Compte TikTok 24/7 (Vues & Commentaires)
+
+on:
+  schedule:
+    # Exécution automatique toutes les 6 heures (00h, 06h, 12h, 18h GMT)
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      max_scrolls:
+        description: "📜 Nombre de défilements dans TikTok Studio (3 = ~25-35 vidéos récentes)"
+        required: false
+        default: "3"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  analyze-account:
+    name: 🔎 Diagnostic Santé & Croissance TikTok 24/7
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Récupération du dépôt & historique
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ⚙️ Configuration de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: 📦 Installation légère (Playwright uniquement, sans FFmpeg)
+        run: |
+          pip install --upgrade pip
+          pip install playwright playwright-stealth requests
+          playwright install --with-deps chromium
+
+      - name: 📊 Analyse en lecture seule de TikTok Studio
+        env:
+          TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
+          TIKTOK_WEBHOOK_URL: ${{ secrets.TIKTOK_WEBHOOK_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MAX_SCROLLS: ${{ github.event.inputs.max_scrolls || '3' }}
+        run: |
+          python -u -m src.account_analyzer --out output/account_analyzer --max-scrolls "$MAX_SCROLLS"
+
+      - name: 💾 Sauvegarde du rapport & recommandations dans GitHub
+        if: always()
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "Karl-Account-Analyzer[bot]"
+          git add history/account_analytics.json history/growth_recommendations.json history/ACCOUNT_HEALTH_REPORT.md 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "ℹ️ Aucune mise à jour analytique à pousser."
+          else
+            git commit -m "chore(analytics): mise à jour analyse compte TikTok 24/7 [skip ci]"
+            git pull --rebase origin main
+            git push origin main
+            echo "✅ Rapport analytique et recommandations synchronisés sur GitHub."
+          fi
+
+      - name: 📦 Archivage de la capture TikTok Studio & données JSON
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tiktok-account-analyzer
+          path: output/account_analyzer/
+          retention-days: 7

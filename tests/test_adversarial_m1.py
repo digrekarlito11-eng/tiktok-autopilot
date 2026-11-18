@@ -294,7 +294,8 @@ class TestGrowthOptimizerAdversarial:
         package = g.generate_growth_package(clip_info, title)
 
         assert package["hook_banner"] == "FAIS CETTE PRIÈRE PUISSANTE 🙏"
-        assert "#priere" in package["hashtags"]
+        assert "#JesusChrist" in package["hashtags"]
+        assert "#FoiEnDieu" in package["hashtags"]
 
         with tempfile.TemporaryDirectory() as tmpdir:
             out_file = os.path.join(tmpdir, "unicode_sheet.txt")

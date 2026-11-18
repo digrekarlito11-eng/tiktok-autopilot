@@ -110,27 +110,37 @@ class TestGrowthBotCaptionsAndHashtags:
         expected_summary = " ".join(long_words[:18]) + "..."
         assert f"📖 {expected_summary}" in long_caption
 
-    def test_select_hashtags_base_and_ivory_coast(self, growth_optimizer):
-        """Verifies base Christian tags and Côte d'Ivoire / Abidjan geotags are included."""
-        tags = growth_optimizer._select_hashtags("Un enseignement sur la persévérance.")
-        assert "#chretien" in tags
-        assert "#tiktokchretien" in tags
-        assert "#pourtoi" in tags
-        assert "#fyp" in tags
-        assert "#cotedivoire" in tags
-        assert "#abidjan" in tags
-        assert len(tags) == 10
+    def test_select_hashtags_predication_pack(self, growth_optimizer):
+        """Verifies default Predication pack uses Karl's exact 5 Christian hashtags."""
+        tags = growth_optimizer._select_hashtags("Un enseignement sur la persévérance et l'évangile.")
+        assert tags == [
+            "#Predication",
+            "#Evangile",
+            "#JesusChrist",
+            "#FoiEnDieu",
+            "#ChristianTikTok",
+        ]
+        assert len(tags) == 5
 
-    def test_select_hashtags_thematic_insertions(self, growth_optimizer):
-        """Verifies specific hashtags are prepended when keywords are present."""
-        tags_prophetie = growth_optimizer._select_hashtags("Une prophétie pour l'année.")
-        assert "#prophetie" in tags_prophetie
+    def test_select_hashtags_priere_and_gospel_packs(self, growth_optimizer):
+        """Verifies Priere and Gospel packs are selected according to clip content."""
+        tags_priere = growth_optimizer._select_hashtags("Fais cette prière puissante d'intercession et de délivrance.")
+        assert tags_priere == [
+            "#Priere",
+            "#PriereDuJour",
+            "#JesusChrist",
+            "#FoiEnDieu",
+            "#CotedIvoire",
+        ]
 
-        tags_miracle = growth_optimizer._select_hashtags("Un miracle extraordinaire.")
-        assert "#miracle" in tags_miracle
-
-        tags_combat = growth_optimizer._select_hashtags("Le combat spirituel au quotidien.")
-        assert "#combatspirituel" in tags_combat
+        tags_gospel = growth_optimizer._select_hashtags("Un moment de louange et adoration gospel africain.")
+        assert tags_gospel == [
+            "#Gospel",
+            "#MusiqueChretienne",
+            "#Louange",
+            "#JesusChrist",
+            "#GospelAfricain",
+        ]
 
     def test_retention_score_calculation(self, growth_optimizer):
         """Verifies retention formula min(92, int(70 + score * 1.4))."""
@@ -167,7 +177,8 @@ class TestGrowthBotCornerCases:
         pkg = growth_optimizer.generate_growth_package({}, "")
         assert pkg["hook_banner"] == "DIEU A UN MESSAGE POUR TOI AUJOURD'HUI ✝️"
         assert "📖" in pkg["caption"]
-        assert len(pkg["hashtags"]) == 10
+        assert len(pkg["hashtags"]) == 5
+        assert pkg["hashtags"] == GrowthOptimizer.HASHTAG_PACKS["predication"]
         assert pkg["estimated_retention"] == "84%"  # Default score 10 in clip_info.get("score", 10)
 
     def test_special_characters_and_french_accents(self, growth_optimizer):
