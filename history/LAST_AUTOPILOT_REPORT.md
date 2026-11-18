@@ -1,36 +1,14 @@
 # 🕊️ Rapport Autopilot 24/7 - Prédications & Publications TikTok
-**Dernière exécution :** 18/11/2026 à 00:57 GMT (Fuseau horaire GMT / Abidjan)
-**Statut :** `SUCCES`
+**Dernière exécution :** 18/11/2026 à 15:17 GMT (Fuseau horaire GMT / Abidjan)
+**Statut :** `TOUTES_VIDEOS_TRAITEES`
 **Total prédications traitées :** 8
 **Bibliothèque source :** [Accéder au dossier YouTube](https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ)
 
 ---
 
-## 🎬 Dernière Prédication Traitée
-- **Titre :** The snakes are burning in the fire! You will no longer feel any pain | MORNING COMMAND
-- **Lien :** [https://www.youtube.com/watch?v=Wag_AnvH9dk](https://www.youtube.com/watch?v=Wag_AnvH9dk)
-- **Durée source :** 1:38:30
-- **Clips extraits (1 à 2 min) :** 10
-- **Destination :** Publication Directe sur TikTok 🚀
-
-### 📋 Liste des 10 Shorts Générés avec Gospel Intelligence
-| # | Durée | Accroche (Hook) | Cible Rétention | Publication TikTok |
-|---|---|---|---|---|
-| Clip 1 | 118s | **CE CYCLE DE SOUFFRANCE DANS TA FAMILLE S'ARRÊTE AUJOURD'HUI 🔥** | 92% | ✅ Publié sur TikTok |
-| Clip 2 | 118s | **TU N'ES PAS NÉ POUR ACCOMPAGNER LES AUTRES 🕊️** | 92% | ✅ Publié sur TikTok |
-| Clip 3 | 118s | **LE COMBAT SPIRITUEL QUE BEAUCOUP IGNORENT ⚔️** | 92% | ✅ Publié sur TikTok |
-| Clip 4 | 120s | **LE COMBAT SPIRITUEL QUE BEAUCOUP IGNORENT ⚔️** | 92% | ✅ Publié sur TikTok |
-| Clip 5 | 117s | **TU N'ES PAS NÉ POUR ACCOMPAGNER LES AUTRES 🕊️** | 92% | ✅ Publié sur TikTok |
-| Clip 6 | 118s | **CE CYCLE DE SOUFFRANCE DANS TA FAMILLE S'ARRÊTE AUJOURD'HUI 🔥** | 92% | ✅ Publié sur TikTok |
-| Clip 7 | 119s | **DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️** | 92% | ✅ Publié sur TikTok |
-| Clip 8 | 118s | **POURQUOI CETTE ÉPREUVE DANS TA VIE ? 📖** | 92% | ✅ Publié sur TikTok |
-| Clip 9 | 118s | **CE CYCLE DE SOUFFRANCE DANS TA FAMILLE S'ARRÊTE AUJOURD'HUI 🔥** | 92% | ✅ Publié sur TikTok |
-| Clip 10 | 119s | **DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️** | 92% | ✅ Publié sur TikTok |
-
-### 🚀 Publication Directe Activée pour Karl
-1. Ouvre ton profil TikTok : les Shorts validés sont déjà en ligne sur ton fil public !
-2. Chaque vidéo contient son accroche visuelle, ses sous-titres Gospel Gold et ses hashtags (#mariage, #foi, #chretien).
-3. L'Autopilot continuera automatiquement au prochain cycle (06h00 & 18h00 GMT).
+## ℹ️ État de la Bibliothèque
+Toutes les prédications actuellement présentes dans la bibliothèque de Karl ont déjà été découpées et transférées.
+Dès que Karl ajoute une nouvelle prédication dans la playlist YouTube, l'Autopilot la traitera automatiquement lors du prochain cycle 24/7 !
 
 ---
 *Généré automatiquement par le CEO Multi-Agents (DevOps-Bot, Media-Bot, Growth-Bot & Gospel Intelligence)*
