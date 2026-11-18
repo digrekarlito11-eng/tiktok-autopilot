@@ -1,0 +1,37 @@
+{
+  "updated_at": "2026-11-18T23:32:14.061582+00:00",
+  "account_status": "critique",
+  "recommended_cta": "Écris 'AMEN' en commentaire et partage ce message à quelqu'un qui en a besoin 👇🙏",
+  "recommended_clips_per_cycle": 5,
+  "recommended_clip_duration_seconds": [
+    45,
+    75
+  ],
+  "hashtag_packs": {
+    "predication": [
+      "#Predication",
+      "#Evangile",
+      "#JesusChrist",
+      "#FoiEnDieu",
+      "#ChristianTikTok"
+    ],
+    "priere": [
+      "#Priere",
+      "#PriereDuJour",
+      "#JesusChrist",
+      "#FoiEnDieu",
+      "#CotedIvoire"
+    ],
+    "gospel": [
+      "#Gospel",
+      "#MusiqueChretienne",
+      "#Louange",
+      "#JesusChrist",
+      "#GospelAfricain"
+    ]
+  },
+  "active_alerts": [
+    "zero_views_wall",
+    "low_comments"
+  ]
+}

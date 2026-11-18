@@ -1,0 +1,63 @@
+{
+  "last_updated": "2026-11-18T23:32:14.061582+00:00",
+  "snapshots": [
+    {
+      "timestamp": "2026-11-18T23:32:14.061582+00:00",
+      "status": "critique",
+      "kpis": {
+        "publications_count": 85,
+        "drafts_count": 0,
+        "analyzed_videos_count": 10,
+        "total_views": 0,
+        "total_likes": 0,
+        "total_comments": 0,
+        "avg_views": 0.0,
+        "median_views": 0.0,
+        "zero_view_count": 10,
+        "zero_view_ratio": 1.0,
+        "avg_duration_seconds": 118.3,
+        "like_rate_pct": 0.0,
+        "comment_rate_pct": 0.0,
+        "delta_views": 0,
+        "delta_likes": 0,
+        "delta_comments": 0
+      },
+      "active_alerts": [
+        "zero_views_wall",
+        "low_comments"
+      ],
+      "top_videos": [
+        {
+          "title": "18 nov., 00:57",
+          "date": "📖 à remettre cette affaire entre les mains de Dieu. Peu après, le Saint-Esprit me pousse à consulter mes... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoin d'être fortifié aujourd'hui. 🕊️ Écris 'SEIGNEUR GUÉRIS MON CŒUR' en commentaire si tu as besoin de paix 🙏 Enregistre cette vidéo pour la réécouter dans tes moments de prière 📌 #chretien #tiktokchretien #pourtoi #fyp #cotedivoire #abidjan #priere #foi #jesus #predication",
+          "duration": "01:59",
+          "duration_seconds": 119,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "18 nov., 00:55",
+          "date": "📖 permettre le développement de l'application. On est en train de développer, on est en train de faire de... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoin d'être fortifié aujourd'hui. 🕊️ Écris 'AMEN' en commentaire pour sceller cette bénédiction 👇 Enregistre cette vidéo pour la réécouter dans tes moments de prière 📌 #chretien #tiktokchretien #pourtoi #fyp #cotedivoire #abidjan #priere #foi #jesus #predication",
+          "duration": "01:58",
+          "duration_seconds": 118,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "18 nov., 00:54",
+          "date": "📖 de douleurs aux oreilles. C'était très intense, comme si ma tête était frappée. Ce n'était pas une douleur... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoin d'être fortifié aujourd'hui. 🕊️ Écris 'SEIGNEUR GUÉRIS MON CŒUR' en commentaire si tu as besoin de paix 🙏 Enregistre cette vidéo pour la réécouter dans tes moments de prière 📌 #chretien #tiktokchretien #pourtoi #fyp #cotedivoire #abidjan #combatspirituel #priere #foi #jesus",
+          "duration": "01:58",
+          "duration_seconds": 118,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        }
+      ]
+    }
+  ]
+}
