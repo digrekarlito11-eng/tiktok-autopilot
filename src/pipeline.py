@@ -3,6 +3,7 @@ import json
 import shutil
 import hashlib
 import logging
+import time
 from typing import Dict, Any, Optional, List
 
 from .downloader import VideoDownloader
@@ -32,7 +33,10 @@ class TikTokPipeline:
         watermark: str = "@parole.de.foi",
         with_progress_bar: bool = True,
         webhook_url: Optional[str] = None,
-        publish_mode: str = "draft"  # "none", "draft", "public"
+        publish_mode: str = "draft",  # "none", "draft", "public"
+        min_duration: float = 45.0,
+        max_duration: float = 75.0,
+        upload_delay_seconds: int = 0
     ):
         self.output_dir = output_dir
         self.temp_dir = temp_dir
@@ -40,13 +44,16 @@ class TikTokPipeline:
         self.watermark = watermark
         self.with_progress_bar = with_progress_bar
         self.publish_mode = (publish_mode or "draft").strip() or "draft"
+        self.min_duration = min_duration
+        self.max_duration = max_duration
+        self.upload_delay_seconds = max(0, int(upload_delay_seconds or 0))
 
         os.makedirs(self.output_dir, exist_ok=True)
         os.makedirs(self.temp_dir, exist_ok=True)
 
         self.downloader = VideoDownloader(download_dir=self.temp_dir)
         self.transcriber = VideoTranscriber(model_size="tiny")
-        self.extractor = ClipExtractor(min_duration=60.0, max_duration=120.0)
+        self.extractor = ClipExtractor(min_duration=self.min_duration, max_duration=self.max_duration)
         self.growth = GrowthOptimizer()
         self.formatter = VideoFormatter(output_dir=self.output_dir)
         self.notifier = TikTokNotifier(webhook_url=webhook_url)
@@ -192,6 +199,9 @@ class TikTokPipeline:
             # Étape 7 : Publication directe ou mise en brouillon TikTok (DevOps-Bot & Publisher)
             pub_result = None
             if self.publish_mode != "none":
+                if idx > 1 and self.publish_mode == "public" and self.upload_delay_seconds > 0:
+                    print(f"⏳ [Anti-Rafale] Pause de {self.upload_delay_seconds}s avant l'envoi du clip #{idx} pour éviter le bridage TikTok...")
+                    time.sleep(self.upload_delay_seconds)
                 privacy = "PUBLIC_TO_EVERYONE" if self.publish_mode == "public" else "SELF_ONLY"
                 pub_result = self.publisher.publish_clip(
                     video_path=final_video_path,

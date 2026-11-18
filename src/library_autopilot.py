@@ -44,7 +44,10 @@ class LibraryAutopilot:
         theme: str = "gospel",
         watermark: str = "@parole.de.foi",
         publish_mode: str = "public",
-        clips_count: int = 10
+        clips_count: int = 3,
+        min_duration: float = 45.0,
+        max_duration: float = 75.0,
+        upload_delay_seconds: int = 180
     ):
         self.playlist_url = playlist_url
         self.history_path = history_path
@@ -54,6 +57,9 @@ class LibraryAutopilot:
         self.watermark = watermark
         self.publish_mode = (publish_mode or "public").strip() or "public"
         self.clips_count = clips_count
+        self.min_duration = min_duration
+        self.max_duration = max_duration
+        self.upload_delay_seconds = max(0, int(upload_delay_seconds or 0))
 
         os.makedirs(os.path.dirname(self.history_path) or ".", exist_ok=True)
         self.history_data = self._load_history()
@@ -392,7 +398,10 @@ class LibraryAutopilot:
             theme_name=self.theme,
             watermark=self.watermark,
             publish_mode=self.publish_mode,
-            with_progress_bar=True
+            with_progress_bar=True,
+            min_duration=self.min_duration,
+            max_duration=self.max_duration,
+            upload_delay_seconds=self.upload_delay_seconds
         )
 
         try:
@@ -509,7 +518,10 @@ def resolve_publish_mode(env_val: Optional[str], cli_default: str = "public") ->
 def main():
     parser = argparse.ArgumentParser(description="Autopilot 24/7 Bibliothèque YouTube -> Publication Directe TikTok")
     parser.add_argument("--playlist", type=str, default=DEFAULT_PLAYLIST_URL, help="URL de la bibliothèque YouTube")
-    parser.add_argument("--clips", type=int, default=10, help="Nombre de clips de 1-2 min à extraire")
+    parser.add_argument("--clips", type=int, default=3, help="Nombre de clips TikTok à extraire par cycle")
+    parser.add_argument("--min-duration", type=float, default=45.0, help="Durée minimale d'un clip en secondes")
+    parser.add_argument("--max-duration", type=float, default=75.0, help="Durée maximale d'un clip en secondes")
+    parser.add_argument("--upload-delay", type=int, default=180, help="Pause en secondes entre deux publications publiques")
     parser.add_argument("--theme", type=str, default="gospel", help="Thème visuel (gospel, gold, neon, minimal)")
     parser.add_argument("--watermark", type=str, default="@parole.de.foi", help="Identifiant safe-zone")
     parser.add_argument("--publish", type=str, default="public", choices=["draft", "public", "none"], help="Mode publication TikTok")
@@ -527,7 +539,10 @@ def main():
         theme=args.theme,
         watermark=args.watermark,
         publish_mode=publish_mode,
-        clips_count=args.clips
+        clips_count=args.clips,
+        min_duration=args.min_duration,
+        max_duration=args.max_duration,
+        upload_delay_seconds=args.upload_delay
     )
 
     bot.run_cycle(force_video_id=force_id, dry_run=args.dry_run)

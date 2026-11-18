@@ -13,9 +13,9 @@ on:
         type: string
         default: ""
       clips_count:
-        description: "🔢 Nombre de clips TikTok (1 à 2 min) à extraire"
+        description: "🔢 Nombre de clips TikTok (45 à 75s recommandés) à extraire"
         required: false
-        default: "10"
+        default: "3"
         type: choice
         options:
           - "1"
@@ -109,14 +109,14 @@ jobs:
           TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
           TIKTOK_WEBHOOK_URL: ${{ secrets.TIKTOK_WEBHOOK_URL }}
           FORCE_VIDEO_ID: ${{ github.event.inputs.force_video_id }}
-          CLIPS_COUNT: ${{ github.event.inputs.clips_count || '10' }}
+          CLIPS_COUNT: ${{ github.event.inputs.clips_count || '3' }}
           THEME: ${{ github.event.inputs.theme || 'gospel' }}
           PUBLISH_MODE: ${{ github.event.inputs.publish_mode || 'public' }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
           USE_WARP: ${{ github.event.inputs.use_warp || 'true' }}
           ABORT_IF_YOUTUBE_BLOCKED: "1"
         run: |
-          cmd=(python -u -m src.library_autopilot --theme "$THEME" --clips "$CLIPS_COUNT" --publish "$PUBLISH_MODE")
+          cmd=(python -u -m src.library_autopilot --theme "$THEME" --clips "$CLIPS_COUNT" --publish "$PUBLISH_MODE" --min-duration 45 --max-duration 75 --upload-delay 180)
           if [ -n "$FORCE_VIDEO_ID" ]; then
             cmd+=(--force-id "$FORCE_VIDEO_ID")
           fi
@@ -203,14 +203,14 @@ jobs:
           TIKTOK_SESSION_ID: ${{ secrets.TIKTOK_SESSION_ID }}
           TIKTOK_WEBHOOK_URL: ${{ secrets.TIKTOK_WEBHOOK_URL }}
           FORCE_VIDEO_ID: ${{ github.event.inputs.force_video_id }}
-          CLIPS_COUNT: ${{ github.event.inputs.clips_count || '10' }}
+          CLIPS_COUNT: ${{ github.event.inputs.clips_count || '3' }}
           THEME: ${{ github.event.inputs.theme || 'gospel' }}
           PUBLISH_MODE: ${{ github.event.inputs.publish_mode || 'public' }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
           USE_WARP: ${{ github.event.inputs.use_warp || 'true' }}
           ABORT_IF_YOUTUBE_BLOCKED: "0"
         run: |
-          cmd=(python -u -m src.library_autopilot --theme "$THEME" --clips "$CLIPS_COUNT" --publish "$PUBLISH_MODE")
+          cmd=(python -u -m src.library_autopilot --theme "$THEME" --clips "$CLIPS_COUNT" --publish "$PUBLISH_MODE" --min-duration 45 --max-duration 75 --upload-delay 180)
           if [ -n "$FORCE_VIDEO_ID" ]; then
             cmd+=(--force-id "$FORCE_VIDEO_ID")
           fi
