@@ -94,7 +94,7 @@ def parse_studio_row_text(row_text: str) -> Optional[Dict[str, Any]]:
     numeric_tokens: List[int] = []
 
     date_re = re.compile(
-        r"(\d{1,2}\s+[a-zéûôàîç]+\.?,\s*\d{1,2}:\d{2}|\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{2,4}|aujourd'hui|hier|il y a\s+\d+)",
+        r"^(?:\d{1,2}\s+[a-zéûôàîç]+\.?,\s*\d{1,2}:\d{2}|\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{2,4}|aujourd'hui.*|hier.*|il y a\s+\d+.*)$",
         re.IGNORECASE,
     )
     privacy_re = re.compile(
@@ -108,10 +108,10 @@ def parse_studio_row_text(row_text: str) -> Optional[Dict[str, Any]]:
             duration_str = ln
             duration_sec = parse_duration_seconds(ln)
             continue
-        if not date_str and date_re.search(ln):
+        if not date_str and len(ln) <= 35 and date_re.match(ln):
             date_str = ln
             continue
-        if not privacy and privacy_re.search(ln):
+        if not privacy and len(ln) <= 40 and privacy_re.search(ln):
             privacy = ln
             continue
         if metric_re.match(ln.replace("\u00a0", "").replace(" ", "")):

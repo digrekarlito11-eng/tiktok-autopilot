@@ -35,7 +35,7 @@ class TestMetricAndRowParsing:
     def test_parse_studio_row_text_french_ui(self):
         raw = (
             "01:59\n"
-            "📖 Dieu alléluia en être en harmonie au niveau spirituel...\n"
+            "📖 Dieu alléluia... partage-la à quelqu'un qui a besoin d'être fortifié aujourd'hui. 🕊️\n"
             "15 nov., 13:48\n"
             "Tout le monde\n"
             "1,2K\n"
@@ -46,7 +46,7 @@ class TestMetricAndRowParsing:
         assert row is not None
         assert row["duration"] == "01:59"
         assert row["duration_seconds"] == 119
-        assert "harmonie" in row["title"]
+        assert "aujourd'hui" in row["title"]
         assert row["date"] == "15 nov., 13:48"
         assert "Tout le monde" in row["privacy"]
         assert row["views"] == 1200
