@@ -1,8 +1,8 @@
 {
   "playlist_url": "https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ",
   "playlist_title": "Shorts à Générer",
-  "last_updated": "2026-11-17T16:02:06.585870+00:00",
-  "total_processed": 7,
+  "last_updated": "2026-11-18T00:57:27.672341+00:00",
+  "total_processed": 8,
   "processed_video_ids": [
     "g2cfTnE_Hpw",
     "bAgDOVvr4hQ",
@@ -10,7 +10,8 @@
     "8ppFvt9cJzc",
     "8dziRRYiaiU",
     "nG4ZvLSjitg",
-    "fw9ZEg3S1lc"
+    "fw9ZEg3S1lc",
+    "Wag_AnvH9dk"
   ],
   "history": [
     {
@@ -691,6 +692,89 @@
           "publication_status": "success"
         }
       ]
+    },
+    {
+      "id": "Wag_AnvH9dk",
+      "title": "The snakes are burning in the fire! You will no longer feel any pain | MORNING COMMAND",
+      "url": "https://www.youtube.com/watch?v=Wag_AnvH9dk",
+      "processed_at": "2026-11-18T00:57:27.672275+00:00",
+      "delivery_status": "SUCCES",
+      "clips_count": 10,
+      "clips_published": 10,
+      "theme": "gospel",
+      "watermark": "@parole.de.foi",
+      "clips_summary": [
+        {
+          "clip_number": 1,
+          "duration": 118.64,
+          "hook": "CE CYCLE DE SOUFFRANCE DANS TA FAMILLE S'ARRÊTE AUJOURD'HUI 🔥",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 2,
+          "duration": 118.52,
+          "hook": "TU N'ES PAS NÉ POUR ACCOMPAGNER LES AUTRES 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 3,
+          "duration": 118.08,
+          "hook": "LE COMBAT SPIRITUEL QUE BEAUCOUP IGNORENT ⚔️",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 4,
+          "duration": 120.0,
+          "hook": "LE COMBAT SPIRITUEL QUE BEAUCOUP IGNORENT ⚔️",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 5,
+          "duration": 117.32,
+          "hook": "TU N'ES PAS NÉ POUR ACCOMPAGNER LES AUTRES 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 6,
+          "duration": 118.44,
+          "hook": "CE CYCLE DE SOUFFRANCE DANS TA FAMILLE S'ARRÊTE AUJOURD'HUI 🔥",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 7,
+          "duration": 119.64,
+          "hook": "DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 8,
+          "duration": 118.96,
+          "hook": "POURQUOI CETTE ÉPREUVE DANS TA VIE ? 📖",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 9,
+          "duration": 118.72,
+          "hook": "CE CYCLE DE SOUFFRANCE DANS TA FAMILLE S'ARRÊTE AUJOURD'HUI 🔥",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 10,
+          "duration": 119.84,
+          "hook": "DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        }
+      ]
     }
   ],
   "processed_clip_keys": [
@@ -733,6 +817,16 @@
     "fw9ZEg3S1lc:clip_7",
     "fw9ZEg3S1lc:clip_8",
     "fw9ZEg3S1lc:clip_9",
-    "fw9ZEg3S1lc:clip_10"
+    "fw9ZEg3S1lc:clip_10",
+    "Wag_AnvH9dk:clip_1",
+    "Wag_AnvH9dk:clip_2",
+    "Wag_AnvH9dk:clip_3",
+    "Wag_AnvH9dk:clip_4",
+    "Wag_AnvH9dk:clip_5",
+    "Wag_AnvH9dk:clip_6",
+    "Wag_AnvH9dk:clip_7",
+    "Wag_AnvH9dk:clip_8",
+    "Wag_AnvH9dk:clip_9",
+    "Wag_AnvH9dk:clip_10"
   ]
 }
