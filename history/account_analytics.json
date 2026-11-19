@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-19T05:12:30.648926+00:00",
+  "last_updated": "2026-11-19T14:57:34.967252+00:00",
   "snapshots": [
     {
       "timestamp": "2026-11-18T23:32:14.061582+00:00",
@@ -61,6 +61,65 @@
     },
     {
       "timestamp": "2026-11-19T05:12:30.648926+00:00",
+      "status": "critique",
+      "kpis": {
+        "publications_count": 85,
+        "drafts_count": 0,
+        "analyzed_videos_count": 10,
+        "total_views": 0,
+        "total_likes": 0,
+        "total_comments": 0,
+        "avg_views": 0.0,
+        "median_views": 0.0,
+        "zero_view_count": 10,
+        "zero_view_ratio": 1.0,
+        "avg_duration_seconds": 105.1,
+        "like_rate_pct": 0.0,
+        "comment_rate_pct": 0.0,
+        "delta_views": 0,
+        "delta_likes": 0,
+        "delta_comments": 0
+      },
+      "active_alerts": [
+        "burst_posting",
+        "zero_views_wall",
+        "low_comments"
+      ],
+      "top_videos": [
+        {
+          "title": "📖 Amen. Amen. Il faut que les gens, pas que dans ta famille, ta famille est trop petite, dans... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a",
+          "date": "19 nov., 00:12",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 une grâce, frère. C'est une grâce. Nous sommes plus Quand je regarde tous mes pasteurs. Tu as combien... Reçois cette parole dans ta vie et partage-la à quelq",
+          "date": "19 nov., 00:08",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 balades ? Il me dit \"Je me balade dans la salle.\" Bon c'est un secret qu'il m'a donné... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoi",
+          "date": "19 nov., 00:03",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-11-19T14:57:34.967252+00:00",
       "status": "critique",
       "kpis": {
         "publications_count": 85,
