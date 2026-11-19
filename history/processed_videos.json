@@ -1,8 +1,8 @@
 {
   "playlist_url": "https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ",
   "playlist_title": "Shorts à Générer",
-  "last_updated": "2026-11-19T00:12:20.903477+00:00",
-  "total_processed": 9,
+  "last_updated": "2026-11-19T15:34:55.913329+00:00",
+  "total_processed": 10,
   "processed_video_ids": [
     "g2cfTnE_Hpw",
     "bAgDOVvr4hQ",
@@ -12,7 +12,8 @@
     "nG4ZvLSjitg",
     "fw9ZEg3S1lc",
     "Wag_AnvH9dk",
-    "DSK7SQORXdQ"
+    "DSK7SQORXdQ",
+    "lqkfUOh-YCM"
   ],
   "history": [
     {
@@ -810,6 +811,40 @@
           "publication_status": "success"
         }
       ]
+    },
+    {
+      "id": "lqkfUOh-YCM",
+      "title": "Guéris-nous des poisons de l’offense | COMMANDE AU MATIN",
+      "url": "https://www.youtube.com/watch?v=lqkfUOh-YCM",
+      "processed_at": "2026-11-19T15:34:55.913250+00:00",
+      "delivery_status": "SUCCES",
+      "clips_count": 3,
+      "clips_published": 3,
+      "theme": "gospel",
+      "watermark": "@parole.de.foi",
+      "clips_summary": [
+        {
+          "clip_number": 1,
+          "duration": 74.12,
+          "hook": "DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 2,
+          "duration": 74.28,
+          "hook": "DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 3,
+          "duration": 73.32,
+          "hook": "DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        }
+      ]
     }
   ],
   "processed_clip_keys": [
@@ -865,6 +900,9 @@
     "Wag_AnvH9dk:clip_10",
     "DSK7SQORXdQ:clip_1",
     "DSK7SQORXdQ:clip_2",
-    "DSK7SQORXdQ:clip_3"
+    "DSK7SQORXdQ:clip_3",
+    "lqkfUOh-YCM:clip_1",
+    "lqkfUOh-YCM:clip_2",
+    "lqkfUOh-YCM:clip_3"
   ]
 }
