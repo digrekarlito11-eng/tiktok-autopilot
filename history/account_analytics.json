@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-19T14:57:34.967252+00:00",
+  "last_updated": "2026-11-20T00:03:03.736619+00:00",
   "snapshots": [
     {
       "timestamp": "2026-11-18T23:32:14.061582+00:00",
@@ -168,6 +168,65 @@
         {
           "title": "📖 balades ? Il me dit \"Je me balade dans la salle.\" Bon c'est un secret qu'il m'a donné... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoi",
           "date": "19 nov., 00:03",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-11-20T00:03:03.736619+00:00",
+      "status": "critique",
+      "kpis": {
+        "publications_count": 88,
+        "drafts_count": 0,
+        "analyzed_videos_count": 10,
+        "total_views": 0,
+        "total_likes": 0,
+        "total_comments": 0,
+        "avg_views": 0.0,
+        "median_views": 0.0,
+        "zero_view_count": 10,
+        "zero_view_ratio": 1.0,
+        "avg_duration_seconds": 91.7,
+        "like_rate_pct": 0.0,
+        "comment_rate_pct": 0.0,
+        "delta_views": 0,
+        "delta_likes": 0,
+        "delta_comments": 0
+      },
+      "active_alerts": [
+        "burst_posting",
+        "zero_views_wall",
+        "low_comments"
+      ],
+      "top_videos": [
+        {
+          "title": "📖 Oh restaure mon âme, restaure nos âmes, restaure l'âme de mon conjoint, de ma famille, de mes parents,... Reçois cette parole dans ta vie et partage-la à quel",
+          "date": "19 nov., 15:34",
+          "duration": "01:13",
+          "duration_seconds": 73,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 es tu tu as le stress, l'agitation, tu ne sais plus te maîtriser. Tu commences à te masturber.... Reçois cette parole dans ta vie et partage-la à quelqu'un qu",
+          "date": "19 nov., 15:29",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 Oh père, pardon pour tous ceux qui ont été offensés. Pardon pour ceux qui ont le cœur endurci,... Reçois cette parole dans ta vie et partage-la à quelqu'un qu",
+          "date": "19 nov., 15:24",
           "duration": "01:14",
           "duration_seconds": 74,
           "privacy": "Tout le monde",
