@@ -1,8 +1,8 @@
 # 📊 Rapport Santé & Croissance TikTok 24/7 — Karl
 
-- **Dernière analyse :** 2026-11-21T13:56:30.014568+00:00
+- **Dernière analyse :** 2026-11-21T22:37:37.387680+00:00
 - **État du compte :** 🔴 Action prioritaire requise
-- **Vidéos publiées (TikTok Studio) :** 88 (Brouillons : 0)
+- **Vidéos publiées (TikTok Studio) :** 91 (Brouillons : 0)
 - **Vidéos analysées sur ce relevé :** 10
 
 ## 📈 Chiffres clés
@@ -14,18 +14,16 @@
 - **Taux de J'aime / Commentaires :** 0.0% / 0.0%
 
 ## 🔎 Diagnostic (Pourquoi les vues et commentaires manquent)
-- **[CRITIQUE] Publication en rafale (risque de frein anti-spam TikTok) :** 4 vidéos publiées en moins de 30 minutes (18 nov.). Sur TikTok, envoyer beaucoup de vidéos en rafale déclenche souvent un frein anti-spam (0 vue).
 - **[CRITIQUE] Plafond à 0 vue sur la majorité des vidéos :** 10/10 vidéos analysées sont à 0 vue. C'est typique d'un compte récent qui publie uniquement via navigateur sans activité humaine sur téléphone ou après une rafale.
 - **[HAUTE] Absence ou faiblesse des commentaires :** Total commentaires : 0 (taux : 0.0%). Sur TikTok chrétien, les commentaires ('AMEN', témoignages, questions) sont le carburant principal du fil Pour Toi.
 
 ## 🎯 Plan d'action automatique & manuel (prochaines 24h)
-1. Espacer les publications : passer à 2 ou 3 Shorts par cycle (matin 06h, midi 13h, soir 19h GMT) au lieu de 10 d'affilée.
-2. Chauffer le compte 5 min/jour depuis le téléphone : regarder, liker et commenter 5 à 10 vidéos chrétiennes francophones (Yvan Castanou, Marcelo Tunasi, Mohamed Sanogo, etc.).
-3. Épingler un commentaire-question juste après publication et répondre aux 3 premiers commentaires dans les 30 minutes.
+1. Chauffer le compte 5 min/jour depuis le téléphone : regarder, liker et commenter 5 à 10 vidéos chrétiennes francophones (Yvan Castanou, Marcelo Tunasi, Mohamed Sanogo, etc.).
+2. Épingler un commentaire-question juste après publication et répondre aux 3 premiers commentaires dans les 30 minutes.
 
 ## ⚙️ Réglages transmis automatiquement à Growth-Bot
-- **Prochain appel à l'action (CTA) :** `Envoie cette vidéo à un proche et écris 'GLOIRE À DIEU' en commentaire 🕊️👇`
-- **Cadence recommandée :** 3 vidéos espacées par cycle
+- **Prochain appel à l'action (CTA) :** `Écris 'AMEN' en commentaire et partage ce message à quelqu'un qui en a besoin 👇🙏`
+- **Cadence recommandée :** 5 vidéos espacées par cycle
 - **Packs de hashtags chrétiens actifs :**
   - Prédication : `#Predication #Evangile #JesusChrist #FoiEnDieu #ChristianTikTok`
   - Prière : `#Priere #PriereDuJour #JesusChrist #FoiEnDieu #CotedIvoire`

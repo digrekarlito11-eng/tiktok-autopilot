@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-21T13:56:30.014568+00:00",
+  "last_updated": "2026-11-21T22:37:37.387680+00:00",
   "snapshots": [
     {
       "timestamp": "2026-11-18T23:32:14.061582+00:00",
@@ -463,6 +463,64 @@
         {
           "title": "📖 Oh père, pardon pour tous ceux qui ont été offensés. Pardon pour ceux qui ont le cœur endurci,... Reçois cette parole dans ta vie et partage-la à quelqu'un qu",
           "date": "19 nov., 15:24",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-11-21T22:37:37.387680+00:00",
+      "status": "critique",
+      "kpis": {
+        "publications_count": 91,
+        "drafts_count": 0,
+        "analyzed_videos_count": 10,
+        "total_views": 0,
+        "total_likes": 0,
+        "total_comments": 0,
+        "avg_views": 0.0,
+        "median_views": 0.0,
+        "zero_view_count": 10,
+        "zero_view_ratio": 1.0,
+        "avg_duration_seconds": 78.2,
+        "like_rate_pct": 0.0,
+        "comment_rate_pct": 0.0,
+        "delta_views": 0,
+        "delta_likes": 0,
+        "delta_comments": 0
+      },
+      "active_alerts": [
+        "zero_views_wall",
+        "low_comments"
+      ],
+      "top_videos": [
+        {
+          "title": "📖 d'amertume. Si tu n'as s'il y a une seule personne sur la terre à qui tu ne peux... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoin d'ê",
+          "date": "21 nov., 15:41",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 Tu vois la raison des divorce, c'est que tu as oublié que ton mari à la base c'est... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoin d",
+          "date": "21 nov., 15:36",
+          "duration": "01:12",
+          "duration_seconds": 72,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 grandit dans le rejet donc je le je le respire à plein nez. Non non, je ne dis... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoin d'êtr",
+          "date": "21 nov., 15:31",
           "duration": "01:14",
           "duration_seconds": 74,
           "privacy": "Tout le monde",
