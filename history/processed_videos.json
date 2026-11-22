@@ -1,8 +1,8 @@
 {
   "playlist_url": "https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ",
   "playlist_title": "Shorts à Générer",
-  "last_updated": "2026-11-21T15:41:16.103200+00:00",
-  "total_processed": 11,
+  "last_updated": "2026-11-22T14:50:30.224877+00:00",
+  "total_processed": 12,
   "processed_video_ids": [
     "g2cfTnE_Hpw",
     "bAgDOVvr4hQ",
@@ -14,7 +14,8 @@
     "Wag_AnvH9dk",
     "DSK7SQORXdQ",
     "lqkfUOh-YCM",
-    "oQZYYltMe8w"
+    "oQZYYltMe8w",
+    "JJwgWOVQ6Uw"
   ],
   "history": [
     {
@@ -880,6 +881,40 @@
           "publication_status": "success"
         }
       ]
+    },
+    {
+      "id": "JJwgWOVQ6Uw",
+      "title": "Obey or Die, the Ultimate Remedy for Healing Inner Wounds - Ps Juliana ONDO",
+      "url": "https://www.youtube.com/watch?v=JJwgWOVQ6Uw",
+      "processed_at": "2026-11-22T14:50:30.224807+00:00",
+      "delivery_status": "SUCCES",
+      "clips_count": 3,
+      "clips_published": 3,
+      "theme": "gospel",
+      "watermark": "@parole.de.foi",
+      "clips_summary": [
+        {
+          "clip_number": 1,
+          "duration": 74.76,
+          "hook": "DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 2,
+          "duration": 73.8,
+          "hook": "DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 3,
+          "duration": 73.04,
+          "hook": "FAIS CETTE PRIÈRE PUISSANTE 🙏",
+          "retention": "92%",
+          "publication_status": "success"
+        }
+      ]
     }
   ],
   "processed_clip_keys": [
@@ -941,6 +976,9 @@
     "lqkfUOh-YCM:clip_3",
     "oQZYYltMe8w:clip_1",
     "oQZYYltMe8w:clip_2",
-    "oQZYYltMe8w:clip_3"
+    "oQZYYltMe8w:clip_3",
+    "JJwgWOVQ6Uw:clip_1",
+    "JJwgWOVQ6Uw:clip_2",
+    "JJwgWOVQ6Uw:clip_3"
   ]
 }
