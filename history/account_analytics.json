@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-21T22:37:37.387680+00:00",
+  "last_updated": "2026-11-22T04:14:49.558992+00:00",
   "snapshots": [
     {
       "timestamp": "2026-11-18T23:32:14.061582+00:00",
@@ -521,6 +521,64 @@
         {
           "title": "📖 grandit dans le rejet donc je le je le respire à plein nez. Non non, je ne dis... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoin d'êtr",
           "date": "21 nov., 15:31",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-11-22T04:14:49.558992+00:00",
+      "status": "critique",
+      "kpis": {
+        "publications_count": 94,
+        "drafts_count": 0,
+        "analyzed_videos_count": 10,
+        "total_views": 0,
+        "total_likes": 0,
+        "total_comments": 0,
+        "avg_views": 0.0,
+        "median_views": 0.0,
+        "zero_view_count": 10,
+        "zero_view_ratio": 1.0,
+        "avg_duration_seconds": 73.8,
+        "like_rate_pct": 0.0,
+        "comment_rate_pct": 0.0,
+        "delta_views": 0,
+        "delta_likes": 0,
+        "delta_comments": 0
+      },
+      "active_alerts": [
+        "zero_views_wall",
+        "low_comments"
+      ],
+      "top_videos": [
+        {
+          "title": "📖 vient de où je viens entendre qu'on a parlé, on m'a fait du mal, je dis Seigneur, je... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoin",
+          "date": "21 nov., 23:27",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 J'accepte de servir. J'arrête de négocier avec la parole. J'arrête de créer un retard de créer ah la... Reçois cette parole dans ta vie et partage-la à quelqu",
+          "date": "21 nov., 23:22",
+          "duration": "01:15",
+          "duration_seconds": 75,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 planté dans ton cœur sera déraciné au nom de Jésus. Toutes les blessures, les fissures de ton âme... Reçois cette parole dans ta vie et partage-la à quelqu'un",
+          "date": "21 nov., 23:16",
           "duration": "01:14",
           "duration_seconds": 74,
           "privacy": "Tout le monde",
