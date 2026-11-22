@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-22T13:50:55.784244+00:00",
+  "last_updated": "2026-11-22T23:00:37.942691+00:00",
   "snapshots": [
     {
       "timestamp": "2026-11-18T23:32:14.061582+00:00",
@@ -637,6 +637,64 @@
         {
           "title": "📖 planté dans ton cœur sera déraciné au nom de Jésus. Toutes les blessures, les fissures de ton âme... Reçois cette parole dans ta vie et partage-la à quelqu'un",
           "date": "21 nov., 23:16",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-11-22T23:00:37.942691+00:00",
+      "status": "critique",
+      "kpis": {
+        "publications_count": 97,
+        "drafts_count": 0,
+        "analyzed_videos_count": 10,
+        "total_views": 0,
+        "total_likes": 0,
+        "total_comments": 0,
+        "avg_views": 0.0,
+        "median_views": 0.0,
+        "zero_view_count": 10,
+        "zero_view_ratio": 1.0,
+        "avg_duration_seconds": 73.6,
+        "like_rate_pct": 0.0,
+        "comment_rate_pct": 0.0,
+        "delta_views": 0,
+        "delta_likes": 0,
+        "delta_comments": 0
+      },
+      "active_alerts": [
+        "zero_views_wall",
+        "low_comments"
+      ],
+      "top_videos": [
+        {
+          "title": "📖 Seigneur, je te demande pardon pour cette personne, pardon pour sa folie, pardon pour pour son pour son... Reçois cette parole dans ta vie et partage-la à que",
+          "date": "22 nov., 14:50",
+          "duration": "01:13",
+          "duration_seconds": 73,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 créer un retard de créer ah la la la le le le retard dans ma propre vie à... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoin d'être for",
+          "date": "22 nov., 14:45",
+          "duration": "01:13",
+          "duration_seconds": 73,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 planté dans ton cœur sera déraciné au nom de Jésus. Toutes les blessures, les fissures de ton âme... Reçois cette parole dans ta vie et partage-la à quelqu'un",
+          "date": "22 nov., 14:41",
           "duration": "01:14",
           "duration_seconds": 74,
           "privacy": "Tout le monde",
