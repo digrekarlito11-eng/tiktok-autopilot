@@ -1,8 +1,8 @@
 {
   "playlist_url": "https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ",
   "playlist_title": "Shorts à Générer",
-  "last_updated": "2026-11-22T14:50:30.224877+00:00",
-  "total_processed": 12,
+  "last_updated": "2026-11-23T18:29:50.132936+00:00",
+  "total_processed": 13,
   "processed_video_ids": [
     "g2cfTnE_Hpw",
     "bAgDOVvr4hQ",
@@ -15,7 +15,8 @@
     "DSK7SQORXdQ",
     "lqkfUOh-YCM",
     "oQZYYltMe8w",
-    "JJwgWOVQ6Uw"
+    "JJwgWOVQ6Uw",
+    "ESY9B55yW9o"
   ],
   "history": [
     {
@@ -915,6 +916,40 @@
           "publication_status": "success"
         }
       ]
+    },
+    {
+      "id": "ESY9B55yW9o",
+      "title": "Des renforts arrivent dans tes combats grâce à la prière d'accord | COMMANDE AU MATIN ",
+      "url": "https://www.youtube.com/watch?v=ESY9B55yW9o",
+      "processed_at": "2026-11-23T18:29:50.132857+00:00",
+      "delivery_status": "SUCCES",
+      "clips_count": 3,
+      "clips_published": 3,
+      "theme": "gospel",
+      "watermark": "@parole.de.foi",
+      "clips_summary": [
+        {
+          "clip_number": 1,
+          "duration": 74.4,
+          "hook": "DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 2,
+          "duration": 74.92,
+          "hook": "CE CYCLE DE SOUFFRANCE DANS TA FAMILLE S'ARRÊTE AUJOURD'HUI 🔥",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 3,
+          "duration": 73.56,
+          "hook": "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡",
+          "retention": "92%",
+          "publication_status": "success"
+        }
+      ]
     }
   ],
   "processed_clip_keys": [
@@ -979,6 +1014,9 @@
     "oQZYYltMe8w:clip_3",
     "JJwgWOVQ6Uw:clip_1",
     "JJwgWOVQ6Uw:clip_2",
-    "JJwgWOVQ6Uw:clip_3"
+    "JJwgWOVQ6Uw:clip_3",
+    "ESY9B55yW9o:clip_1",
+    "ESY9B55yW9o:clip_2",
+    "ESY9B55yW9o:clip_3"
   ]
 }
