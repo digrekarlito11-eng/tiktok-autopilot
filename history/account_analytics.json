@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-23T16:55:33.187451+00:00",
+  "last_updated": "2026-11-24T03:40:06.426835+00:00",
   "snapshots": [
     {
       "timestamp": "2026-11-18T23:32:14.061582+00:00",
@@ -811,6 +811,64 @@
         {
           "title": "📖 planté dans ton cœur sera déraciné au nom de Jésus. Toutes les blessures, les fissures de ton âme... Reçois cette parole dans ta vie et partage-la à quelqu'un",
           "date": "22 nov., 14:41",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-11-24T03:40:06.426835+00:00",
+      "status": "critique",
+      "kpis": {
+        "publications_count": 100,
+        "drafts_count": 0,
+        "analyzed_videos_count": 10,
+        "total_views": 0,
+        "total_likes": 0,
+        "total_comments": 0,
+        "avg_views": 0.0,
+        "median_views": 0.0,
+        "zero_view_count": 10,
+        "zero_view_ratio": 1.0,
+        "avg_duration_seconds": 73.8,
+        "like_rate_pct": 0.0,
+        "comment_rate_pct": 0.0,
+        "delta_views": 0,
+        "delta_likes": 0,
+        "delta_comments": 0
+      },
+      "active_alerts": [
+        "zero_views_wall",
+        "low_comments"
+      ],
+      "top_videos": [
+        {
+          "title": "📖 pauvreté, serpent de célibat, serpent de voleur de mariage, serpent qui étrangle, voleur de sexe, voleur d'étoile, voleur... Reçois cette parole dans ta vie e",
+          "date": "23 nov., 18:29",
+          "duration": "01:13",
+          "duration_seconds": 73,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 attendez-vous à Dieu et vous verrez la délivrance que l'Éternel vous accordera. Oh Rokaparia Judas et Jérusalem, église... Reçois cette parole dans ta vie et ",
+          "date": "23 nov., 18:24",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 Je rends grâce à Dieu pour ma guérison totale à l'issue de commande au matin de ce jour.... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a be",
+          "date": "23 nov., 18:19",
           "duration": "01:14",
           "duration_seconds": 74,
           "privacy": "Tout le monde",
