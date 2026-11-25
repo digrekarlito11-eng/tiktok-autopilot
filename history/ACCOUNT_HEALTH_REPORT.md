@@ -1,8 +1,8 @@
 # 📊 Rapport Santé & Croissance TikTok 24/7 — Karl
 
-- **Dernière analyse :** 2026-11-25T01:46:26.572377+00:00
+- **Dernière analyse :** 2026-11-25T16:32:36.189492+00:00
 - **État du compte :** 🔴 Action prioritaire requise
-- **Vidéos publiées (TikTok Studio) :** 100 (Brouillons : 0)
+- **Vidéos publiées (TikTok Studio) :** 103 (Brouillons : 0)
 - **Vidéos analysées sur ce relevé :** 10
 
 ## 📈 Chiffres clés
@@ -22,7 +22,7 @@
 2. Épingler un commentaire-question juste après publication et répondre aux 3 premiers commentaires dans les 30 minutes.
 
 ## ⚙️ Réglages transmis automatiquement à Growth-Bot
-- **Prochain appel à l'action (CTA) :** `Écris 'AMEN' en commentaire et partage ce message à quelqu'un qui en a besoin 👇🙏`
+- **Prochain appel à l'action (CTA) :** `Quelle phrase de cette parole t'a le plus touché aujourd'hui ? Dis-le en commentaire 👇📖`
 - **Cadence recommandée :** 5 vidéos espacées par cycle
 - **Packs de hashtags chrétiens actifs :**
   - Prédication : `#Predication #Evangile #JesusChrist #FoiEnDieu #ChristianTikTok`

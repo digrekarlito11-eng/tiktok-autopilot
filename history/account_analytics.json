@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-25T01:46:26.572377+00:00",
+  "last_updated": "2026-11-25T16:32:36.189492+00:00",
   "snapshots": [
     {
       "timestamp": "2026-11-18T23:32:14.061582+00:00",
@@ -987,6 +987,64 @@
           "date": "23 nov., 18:19",
           "duration": "01:14",
           "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-11-25T16:32:36.189492+00:00",
+      "status": "critique",
+      "kpis": {
+        "publications_count": 103,
+        "drafts_count": 0,
+        "analyzed_videos_count": 10,
+        "total_views": 0,
+        "total_likes": 0,
+        "total_comments": 0,
+        "avg_views": 0.0,
+        "median_views": 0.0,
+        "zero_view_count": 10,
+        "zero_view_ratio": 1.0,
+        "avg_duration_seconds": 73.2,
+        "like_rate_pct": 0.0,
+        "comment_rate_pct": 0.0,
+        "delta_views": 0,
+        "delta_likes": 0,
+        "delta_comments": 0
+      },
+      "active_alerts": [
+        "zero_views_wall",
+        "low_comments"
+      ],
+      "top_videos": [
+        {
+          "title": "📖 vraiment proches et moi c'était comme si j'étais à côté. Et donc c'est tout ce processus là qui... Reçois cette parole dans ta vie et partage-la à quelqu'un q",
+          "date": "25 nov., 02:25",
+          "duration": "01:13",
+          "duration_seconds": 73,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 nous te rendons grâce. Nous te rendons grâce. Nous te rendons grâce Père. Est-ce que cette parole nous... Reçois cette parole dans ta vie et partage-la à quel",
+          "date": "25 nov., 02:21",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 0,
+          "comments": 0
+        },
+        {
+          "title": "📖 Il faut qu'on sache que nous nous sommes de Dieu, que nous avons la vie de Dieu, nous... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoi",
+          "date": "25 nov., 02:16",
+          "duration": "01:10",
+          "duration_seconds": 70,
           "privacy": "Tout le monde",
           "views": 0,
           "likes": 0,
