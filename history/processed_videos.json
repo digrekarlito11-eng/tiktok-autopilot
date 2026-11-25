@@ -1,8 +1,8 @@
 {
   "playlist_url": "https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ",
   "playlist_title": "Shorts à Générer",
-  "last_updated": "2026-11-25T02:25:54.947981+00:00",
-  "total_processed": 14,
+  "last_updated": "2026-11-25T17:43:53.344827+00:00",
+  "total_processed": 15,
   "processed_video_ids": [
     "g2cfTnE_Hpw",
     "bAgDOVvr4hQ",
@@ -17,7 +17,8 @@
     "oQZYYltMe8w",
     "JJwgWOVQ6Uw",
     "ESY9B55yW9o",
-    "7nbqYNwa1vQ"
+    "7nbqYNwa1vQ",
+    "cyqYGc97JTs"
   ],
   "history": [
     {
@@ -985,6 +986,40 @@
           "publication_status": "success"
         }
       ]
+    },
+    {
+      "id": "cyqYGc97JTs",
+      "title": "Je ne subirai pas : je brise les plafonds de limitations ! | COMMANDE AU MATIN",
+      "url": "https://www.youtube.com/watch?v=cyqYGc97JTs",
+      "processed_at": "2026-11-25T17:43:53.344755+00:00",
+      "delivery_status": "SUCCES",
+      "clips_count": 3,
+      "clips_published": 3,
+      "theme": "gospel",
+      "watermark": "@parole.de.foi",
+      "clips_summary": [
+        {
+          "clip_number": 1,
+          "duration": 73.72,
+          "hook": "DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 2,
+          "duration": 74.88,
+          "hook": "NE DOUTE PLUS DE TA DESTINÉE 👑",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 3,
+          "duration": 74.68,
+          "hook": "DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        }
+      ]
     }
   ],
   "processed_clip_keys": [
@@ -1055,6 +1090,9 @@
     "ESY9B55yW9o:clip_3",
     "7nbqYNwa1vQ:clip_1",
     "7nbqYNwa1vQ:clip_2",
-    "7nbqYNwa1vQ:clip_3"
+    "7nbqYNwa1vQ:clip_3",
+    "cyqYGc97JTs:clip_1",
+    "cyqYGc97JTs:clip_2",
+    "cyqYGc97JTs:clip_3"
   ]
 }
