@@ -1,8 +1,8 @@
 {
   "playlist_url": "https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ",
   "playlist_title": "Shorts à Générer",
-  "last_updated": "2026-11-23T18:29:50.132936+00:00",
-  "total_processed": 13,
+  "last_updated": "2026-11-25T02:25:54.947981+00:00",
+  "total_processed": 14,
   "processed_video_ids": [
     "g2cfTnE_Hpw",
     "bAgDOVvr4hQ",
@@ -16,7 +16,8 @@
     "lqkfUOh-YCM",
     "oQZYYltMe8w",
     "JJwgWOVQ6Uw",
-    "ESY9B55yW9o"
+    "ESY9B55yW9o",
+    "7nbqYNwa1vQ"
   ],
   "history": [
     {
@@ -950,6 +951,40 @@
           "publication_status": "success"
         }
       ]
+    },
+    {
+      "id": "7nbqYNwa1vQ",
+      "title": "We Must See the Difference Between Us and the World | MORNING COMMAND",
+      "url": "https://www.youtube.com/watch?v=7nbqYNwa1vQ",
+      "processed_at": "2026-11-25T02:25:54.947867+00:00",
+      "delivery_status": "SUCCES",
+      "clips_count": 3,
+      "clips_published": 3,
+      "theme": "gospel",
+      "watermark": "@parole.de.foi",
+      "clips_summary": [
+        {
+          "clip_number": 1,
+          "duration": 70.08,
+          "hook": "LE COMBAT SPIRITUEL QUE BEAUCOUP IGNORENT ⚔️",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 2,
+          "duration": 74.72,
+          "hook": "CETTE PAROLE VA CHANGER TA VIE ✨",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 3,
+          "duration": 73.72,
+          "hook": "DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️",
+          "retention": "92%",
+          "publication_status": "success"
+        }
+      ]
     }
   ],
   "processed_clip_keys": [
@@ -1017,6 +1052,9 @@
     "JJwgWOVQ6Uw:clip_3",
     "ESY9B55yW9o:clip_1",
     "ESY9B55yW9o:clip_2",
-    "ESY9B55yW9o:clip_3"
+    "ESY9B55yW9o:clip_3",
+    "7nbqYNwa1vQ:clip_1",
+    "7nbqYNwa1vQ:clip_2",
+    "7nbqYNwa1vQ:clip_3"
   ]
 }
