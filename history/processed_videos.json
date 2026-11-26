@@ -1,8 +1,8 @@
 {
   "playlist_url": "https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ",
   "playlist_title": "Shorts à Générer",
-  "last_updated": "2026-11-25T17:43:53.344827+00:00",
-  "total_processed": 15,
+  "last_updated": "2026-11-26T01:56:15.982138+00:00",
+  "total_processed": 16,
   "processed_video_ids": [
     "g2cfTnE_Hpw",
     "bAgDOVvr4hQ",
@@ -18,7 +18,8 @@
     "JJwgWOVQ6Uw",
     "ESY9B55yW9o",
     "7nbqYNwa1vQ",
-    "cyqYGc97JTs"
+    "cyqYGc97JTs",
+    "RJtgQYESGkI"
   ],
   "history": [
     {
@@ -1020,6 +1021,40 @@
           "publication_status": "success"
         }
       ]
+    },
+    {
+      "id": "RJtgQYESGkI",
+      "title": "CÉLIBATAIRES : COMMENT FAIRE LE BON CHOIX DU CONJOINT ET QUELS SONT LES PIÈGES À ÉVITER?",
+      "url": "https://www.youtube.com/watch?v=RJtgQYESGkI",
+      "processed_at": "2026-11-26T01:56:15.982050+00:00",
+      "delivery_status": "SUCCES",
+      "clips_count": 3,
+      "clips_published": 3,
+      "theme": "gospel",
+      "watermark": "@parole.de.foi",
+      "clips_summary": [
+        {
+          "clip_number": 1,
+          "duration": 73.8,
+          "hook": "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 2,
+          "duration": 74.76,
+          "hook": "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡",
+          "retention": "92%",
+          "publication_status": "success"
+        },
+        {
+          "clip_number": 3,
+          "duration": 73.32,
+          "hook": "LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡",
+          "retention": "92%",
+          "publication_status": "success"
+        }
+      ]
     }
   ],
   "processed_clip_keys": [
@@ -1093,6 +1128,9 @@
     "7nbqYNwa1vQ:clip_3",
     "cyqYGc97JTs:clip_1",
     "cyqYGc97JTs:clip_2",
-    "cyqYGc97JTs:clip_3"
+    "cyqYGc97JTs:clip_3",
+    "RJtgQYESGkI:clip_1",
+    "RJtgQYESGkI:clip_2",
+    "RJtgQYESGkI:clip_3"
   ]
 }

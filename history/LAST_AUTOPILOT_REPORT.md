@@ -1,24 +1,24 @@
 # 🕊️ Rapport Autopilot 24/7 - Prédications & Publications TikTok
-**Dernière exécution :** 25/11/2026 à 17:43 GMT (Fuseau horaire GMT / Abidjan)
+**Dernière exécution :** 26/11/2026 à 01:56 GMT (Fuseau horaire GMT / Abidjan)
 **Statut :** `SUCCES`
-**Total prédications traitées :** 15
+**Total prédications traitées :** 16
 **Bibliothèque source :** [Accéder au dossier YouTube](https://youtube.com/playlist?list=PLeK7sB4DCSgs&si=jnf4lYNDP9huFSvJ)
 
 ---
 
 ## 🎬 Dernière Prédication Traitée
-- **Titre :** Je ne subirai pas : je brise les plafonds de limitations ! | COMMANDE AU MATIN
-- **Lien :** [https://www.youtube.com/watch?v=cyqYGc97JTs](https://www.youtube.com/watch?v=cyqYGc97JTs)
-- **Durée source :** 1:48:01
+- **Titre :** CÉLIBATAIRES : COMMENT FAIRE LE BON CHOIX DU CONJOINT ET QUELS SONT LES PIÈGES À ÉVITER?
+- **Lien :** [https://www.youtube.com/watch?v=RJtgQYESGkI](https://www.youtube.com/watch?v=RJtgQYESGkI)
+- **Durée source :** 4:19:52
 - **Clips extraits (1 à 2 min) :** 3
 - **Destination :** Publication Directe sur TikTok 🚀
 
 ### 📋 Liste des 3 Shorts Générés avec Gospel Intelligence
 | # | Durée | Accroche (Hook) | Cible Rétention | Publication TikTok |
 |---|---|---|---|---|
-| Clip 1 | 73s | **DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️** | 92% | ✅ Publié sur TikTok |
-| Clip 2 | 74s | **NE DOUTE PLUS DE TA DESTINÉE 👑** | 92% | ✅ Publié sur TikTok |
-| Clip 3 | 74s | **DIEU A VU TES LARMES CACHÉES : REÇOIS SA GUÉRISON 🕊️** | 92% | ✅ Publié sur TikTok |
+| Clip 1 | 73s | **LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡** | 92% | ✅ Publié sur TikTok |
+| Clip 2 | 74s | **LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡** | 92% | ✅ Publié sur TikTok |
+| Clip 3 | 73s | **LA VÉRITÉ SUR LE MARIAGE QUE PERSONNE N'OSE DIRE ⚡** | 92% | ✅ Publié sur TikTok |
 
 ### 🚀 Publication Directe Activée pour Karl
 1. Ouvre ton profil TikTok : les Shorts validés sont déjà en ligne sur ton fil public !
