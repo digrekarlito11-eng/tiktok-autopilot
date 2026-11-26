@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-26T01:21:53.572898+00:00",
+  "last_updated": "2026-11-26T16:04:43.343534+00:00",
   "snapshots": [
     {
       "timestamp": "2026-11-18T23:32:14.061582+00:00",
@@ -1071,6 +1071,64 @@
         "comment_rate_pct": 0.0,
         "delta_views": 0,
         "delta_likes": 10,
+        "delta_comments": 0
+      },
+      "active_alerts": [
+        "zero_views_wall",
+        "low_comments"
+      ],
+      "top_videos": [
+        {
+          "title": "📖 d'ouvrir la voix. J'appelle le ministère des anges d'amener les finances, d'amener la guérison, d'amener la provision financière,... Reçois cette parole dans ",
+          "date": "25 nov., 17:43",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 1,
+          "comments": 0
+        },
+        {
+          "title": "📖 si tu n'as pas la foi, ça te regarde. Mais moi, j'ai la foi pour cette parole. Je... Reçois cette parole dans ta vie et partage-la à quelqu'un qui a besoin d'",
+          "date": "25 nov., 17:39",
+          "duration": "01:14",
+          "duration_seconds": 74,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 1,
+          "comments": 0
+        },
+        {
+          "title": "📖 conscience que je portais des blessures liées à mon enfance, notamment du rejet, de l'amertume et du manque... Reçois cette parole dans ta vie et partage-la à",
+          "date": "25 nov., 17:34",
+          "duration": "01:13",
+          "duration_seconds": 73,
+          "privacy": "Tout le monde",
+          "views": 0,
+          "likes": 1,
+          "comments": 0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-11-26T16:04:43.343534+00:00",
+      "status": "critique",
+      "kpis": {
+        "publications_count": 109,
+        "drafts_count": 0,
+        "analyzed_videos_count": 10,
+        "total_views": 0,
+        "total_likes": 7,
+        "total_comments": 0,
+        "avg_views": 0.0,
+        "median_views": 0.0,
+        "zero_view_count": 10,
+        "zero_view_ratio": 1.0,
+        "avg_duration_seconds": 73.1,
+        "like_rate_pct": 0.0,
+        "comment_rate_pct": 0.0,
+        "delta_views": 0,
+        "delta_likes": -3,
         "delta_comments": 0
       },
       "active_alerts": [
